@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">AirPrima</string>
+
+    <string name="menu_info">Info</string>
+    <string name="menu_home">Home</string>
+
+    <string name="main_mobile">Mobiles Messen</string>
+    <string name="main_stationary">Stationäres Messen</string>
+
+    <string name="information_product">Produkt Infos</string>
+    <string name="information_finedust">Feinstaub Infos</string>
+
+    <string name="stationary_connect">Mit Sensor verbinden</string>
+    <string name="stationary_old_data">Daten einsehen</string>
+</resources>
