@@ -39,7 +39,8 @@ public class StationaryActivity extends AppCompatActivity {
         oldDataLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                Intent locationsIntent = new Intent(v.getContext(), LocationsActivity.class);
+                startActivity(locationsIntent);
             }
         });
     }

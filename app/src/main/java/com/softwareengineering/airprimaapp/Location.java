@@ -12,6 +12,12 @@ public class Location implements Parcelable {
     private String name;
     private int measuringFreq;
 
+    public Location(String name, int measuringFreq) {
+        this.id = -1;       // Gets set when inserted into DB
+        this.name = name;
+        this.measuringFreq = measuringFreq;
+    }
+
     public Location(long id, String name, int measuringFreq) {
         this.id = id;
         this.name = name;

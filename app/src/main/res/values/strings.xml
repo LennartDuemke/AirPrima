@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">AirPrima</string>
 
+    <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+
     <string name="menu_info">Info</string>
     <string name="menu_home">Home</string>
 
@@ -12,4 +17,20 @@
 
     <string name="stationary_connect">Mit Sensor verbinden</string>
     <string name="stationary_old_data">Daten einsehen</string>
+
+    <string name="locations_title">Ihre Standorte</string>
+    <string name="locations_button">Neuen Standort hinzufügen</string>
+
+    <string name="location_edit_title">Neuer Standort</string>
+    <string name="location_edit_label1">Standortname:</string>
+    <string name="location_edit_label2">Messhäufigkeit [Minuten]:</string>
+    <string name="location_edit_hint1">Name</string>
+    <string name="location_edit_hint2">Zahl zwischen 2 und 60</string>
+    <string name="location_edit_delete">Standort löschen</string>
+    <string name="location_edit_delete_title">Standort löschen</string>
+    <string name="location_edit_delete_message">Wollen Sie wirklich diesen Standort löschen?</string>
+    <string name="location_edit_empty_name">Der Standortname darf nicht leer sein!</string>
+    <string name="location_edit_empty_freq">Die Messhäufigkeit darf nicht leer sein!</string>
+    <string name="location_edit_freq_range">Die Messhäufigkeit darf nur zwischen 2min und 60min sein!</string>
+
 </resources>

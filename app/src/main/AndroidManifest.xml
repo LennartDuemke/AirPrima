@@ -33,6 +33,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <activity android:name=".LocationsActivity"
+            android:parentActivityName=".StationaryActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".StationaryActivity" />
+        </activity>
+
+        <activity android:name=".EditLocationActivity"
+            android:parentActivityName=".LocationsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LocationsActivity" />
+        </activity>
+
     </application>
 
 </manifest>
