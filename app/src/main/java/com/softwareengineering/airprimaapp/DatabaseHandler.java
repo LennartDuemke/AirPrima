@@ -101,14 +101,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserts a location into the table "location"
      */
-    public void insertLocation(String name, int measuringFreq) {
+    public void insertLocation(Location location) {
         long rowId = -1;
         try {
             SQLiteDatabase db = getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(LOCATION_NAME, name);
-            values.put(LOCATION_MEASURING_FREQ, measuringFreq);
+            values.put(LOCATION_NAME, location.getName());
+            values.put(LOCATION_MEASURING_FREQ, location.getMeasuringFreq());
 
             rowId = db.insert(TABLE_LOCATION, null, values);
 
@@ -122,18 +122,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserts a measurement into the table "measurement"
      */
-    public void insertMeasurement(long timestamp, float pm2_5, float pm10, float temp, float hum, long locationId) {
+    public void insertMeasurement(Measurement m) {
         long rowId = -1;
         try {
             SQLiteDatabase db = getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(MEASUREMENT_TIMESTAMP, timestamp);
-            values.put(MEASUREMENT_PM_2_5, pm2_5);
-            values.put(MEASUREMENT_PM_10, pm10);
-            values.put(MEASUREMENT_TEMP, temp);
-            values.put(MEASUREMENT_HUM, hum);
-            values.put(MEASUREMENT_LOCATION, locationId);
+            values.put(MEASUREMENT_TIMESTAMP, m.getTimestamp());
+            values.put(MEASUREMENT_PM_2_5, m.getPm2_5());
+            values.put(MEASUREMENT_PM_10, m.getPm10());
+            values.put(MEASUREMENT_TEMP, m.getTemperature());
+            values.put(MEASUREMENT_HUM, m.getHumidity());
+            values.put(MEASUREMENT_LOCATION, m.getLocationId());
 
             rowId = db.insert(TABLE_MEASUREMENT, null, values);
 
@@ -147,29 +147,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Updates a location in the table "location"
      */
-    public void updateLocation(long id, String name, int measuringFreq) {
+    public void updateLocation(Location location) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(LOCATION_NAME, name);
-        values.put(LOCATION_MEASURING_FREQ, measuringFreq);
-        int numUpdated = db.update(TABLE_LOCATION, values, LOCATION_ID + " = ?", new String[]{Long.toString(id)});
-        Log.d(TAG, "DB - updateLocation(): id = " + id + " -> " + numUpdated);
+        values.put(LOCATION_NAME, location.getName());
+        values.put(LOCATION_MEASURING_FREQ, location.getMeasuringFreq());
+        int numUpdated = db.update(TABLE_LOCATION, values, LOCATION_ID + " = ?", new String[]{Long.toString(location.getId())});
+        Log.d(TAG, "DB - updateLocation(): id = " + location.getId() + " -> " + numUpdated);
     }
 
     /**
      * Updates a measurement in the table "measurement"
      */
-    public void updateMeasurement(long id, long timestamp, float pm2_5, float pm10, float temp, float hum, long locationId) {
+    public void updateMeasurement(Measurement m) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(MEASUREMENT_TIMESTAMP, timestamp);
-        values.put(MEASUREMENT_PM_2_5, pm2_5);
-        values.put(MEASUREMENT_PM_10, pm10);
-        values.put(MEASUREMENT_TEMP, temp);
-        values.put(MEASUREMENT_HUM, hum);
-        values.put(MEASUREMENT_LOCATION, locationId);
-        int numUpdated = db.update(TABLE_MEASUREMENT, values, MEASUREMENT_ID + " = ?", new String[]{Long.toString(id)});
-        Log.d(TAG, "DB - updateMeasurement(): id = " + id + " -> " + numUpdated);
+        values.put(MEASUREMENT_TIMESTAMP, m.getTimestamp());
+        values.put(MEASUREMENT_PM_2_5, m.getPm2_5());
+        values.put(MEASUREMENT_PM_10, m.getPm10());
+        values.put(MEASUREMENT_TEMP, m.getTemperature());
+        values.put(MEASUREMENT_HUM, m.getHumidity());
+        values.put(MEASUREMENT_LOCATION, m.getLocationId());
+        int numUpdated = db.update(TABLE_MEASUREMENT, values, MEASUREMENT_ID + " = ?", new String[]{Long.toString(m.getId())});
+        Log.d(TAG, "DB - updateMeasurement(): id = " + m.getId() + " -> " + numUpdated);
     }
 
     /**
