@@ -31,6 +31,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_MEASUREMENT = "measurement";
     private static final String MEASUREMENT_ID = "_id";
     private static final String MEASUREMENT_TIMESTAMP = "measurement_timestamp";
+    private static final String MEASUREMENT_TIMESTAMP_FMT = "measurement_timestamp_fmt";    // timestamp formatted
     private static final String MEASUREMENT_PM_2_5 = "measurement_pm_2_5";
     private static final String MEASUREMENT_PM_10 = "measurement_pm_10";
     private static final String MEASUREMENT_TEMP = "measurement_temp";
@@ -47,6 +48,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_MEASUREMENT = "CREATE TABLE IF NOT EXISTS " + TABLE_MEASUREMENT + " ("
             + MEASUREMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + MEASUREMENT_TIMESTAMP + " INTEGER NOT NULL, "
+            + MEASUREMENT_TIMESTAMP_FMT + " TEXT NOT NULL, "
             + MEASUREMENT_PM_2_5 + " REAL, "
             + MEASUREMENT_PM_10 + " REAL, "
             + MEASUREMENT_TEMP + " REAL, "
@@ -88,6 +90,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
+     * Drops table "location" and creates it new
+     */
+    public void dropLocationAndCreateNew() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL(DROP_TABLE_LOCATION);
+        db.execSQL(CREATE_TABLE_LOCATION);
+    }
+
+    /**
+     * Drops table "measurement" and creates it new
+     */
+    public void dropMeasurementAndCreateNew() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL(DROP_TABLE_MEASUREMENT);
+        db.execSQL(CREATE_TABLE_MEASUREMENT);
+    }
+
+    /**
      * Called when the database gets upgraded (DB schema changed). All the tables have to be dropped!
      */
     @Override
@@ -101,14 +121,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserts a location into the table "location"
      */
-    public void insertLocation(Location location) {
+    public void insertLocation(String locationName, int measuringFreq) {
         long rowId = -1;
         try {
             SQLiteDatabase db = getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(LOCATION_NAME, location.getName());
-            values.put(LOCATION_MEASURING_FREQ, location.getMeasuringFreq());
+            values.put(LOCATION_NAME, locationName);
+            values.put(LOCATION_MEASURING_FREQ, measuringFreq);
 
             rowId = db.insert(TABLE_LOCATION, null, values);
 
@@ -122,18 +142,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserts a measurement into the table "measurement"
      */
-    public void insertMeasurement(Measurement m) {
+    public void insertMeasurement(long timestamp, String timestampFmt, float pm2_5, float pm10, float temp, float hum, long locationId) {
         long rowId = -1;
         try {
             SQLiteDatabase db = getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(MEASUREMENT_TIMESTAMP, m.getTimestamp());
-            values.put(MEASUREMENT_PM_2_5, m.getPm2_5());
-            values.put(MEASUREMENT_PM_10, m.getPm10());
-            values.put(MEASUREMENT_TEMP, m.getTemperature());
-            values.put(MEASUREMENT_HUM, m.getHumidity());
-            values.put(MEASUREMENT_LOCATION, m.getLocationId());
+            values.put(MEASUREMENT_TIMESTAMP, timestamp);
+            values.put(MEASUREMENT_TIMESTAMP_FMT, timestampFmt);
+            values.put(MEASUREMENT_PM_2_5, pm2_5);
+            values.put(MEASUREMENT_PM_10, pm10);
+            values.put(MEASUREMENT_TEMP, temp);
+            values.put(MEASUREMENT_HUM, hum);
+            values.put(MEASUREMENT_LOCATION, locationId);
 
             rowId = db.insert(TABLE_MEASUREMENT, null, values);
 
@@ -147,29 +168,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Updates a location in the table "location"
      */
-    public void updateLocation(Location location) {
+    public void updateLocation(long id, String locationName, int measuringFreq) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(LOCATION_NAME, location.getName());
-        values.put(LOCATION_MEASURING_FREQ, location.getMeasuringFreq());
-        int numUpdated = db.update(TABLE_LOCATION, values, LOCATION_ID + " = ?", new String[]{Long.toString(location.getId())});
-        Log.d(TAG, "DB - updateLocation(): id = " + location.getId() + " -> " + numUpdated);
+        values.put(LOCATION_NAME, locationName);
+        values.put(LOCATION_MEASURING_FREQ, measuringFreq);
+        int numUpdated = db.update(TABLE_LOCATION, values, LOCATION_ID + " = ?", new String[]{Long.toString(id)});
+        Log.d(TAG, "DB - updateLocation(): id = " + id + " -> " + numUpdated);
     }
 
     /**
      * Updates a measurement in the table "measurement"
      */
-    public void updateMeasurement(Measurement m) {
+    public void updateMeasurement(long id, long timestamp, String timestampFmt, float pm2_5, float pm10, float temp, float hum, long locationId) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(MEASUREMENT_TIMESTAMP, m.getTimestamp());
-        values.put(MEASUREMENT_PM_2_5, m.getPm2_5());
-        values.put(MEASUREMENT_PM_10, m.getPm10());
-        values.put(MEASUREMENT_TEMP, m.getTemperature());
-        values.put(MEASUREMENT_HUM, m.getHumidity());
-        values.put(MEASUREMENT_LOCATION, m.getLocationId());
-        int numUpdated = db.update(TABLE_MEASUREMENT, values, MEASUREMENT_ID + " = ?", new String[]{Long.toString(m.getId())});
-        Log.d(TAG, "DB - updateMeasurement(): id = " + m.getId() + " -> " + numUpdated);
+        values.put(MEASUREMENT_TIMESTAMP, timestamp);
+        values.put(MEASUREMENT_TIMESTAMP_FMT, timestampFmt);
+        values.put(MEASUREMENT_PM_2_5, pm2_5);
+        values.put(MEASUREMENT_PM_10, pm10);
+        values.put(MEASUREMENT_TEMP, temp);
+        values.put(MEASUREMENT_HUM, hum);
+        values.put(MEASUREMENT_LOCATION, locationId);
+        int numUpdated = db.update(TABLE_MEASUREMENT, values, MEASUREMENT_ID + " = ?", new String[]{Long.toString(id)});
+        Log.d(TAG, "DB - updateMeasurement(): id = " + id + " -> " + numUpdated);
     }
 
     /**
@@ -200,11 +222,110 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
+     * SQL query that returns a Cursor with all the measurements (sorted)
+     */
+    public Cursor queryMeasurements() {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, null, null, null,
+                null, null, MEASUREMENT_TIMESTAMP + " DESC");
+    }
+
+    /**
      * SQL query that returns a Cursor with one specific location
      */
     public Cursor querySpecificLocation(long id) {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_LOCATION, null, LOCATION_ID + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
+    }
+
+    /**
+     * SQL query that returns the unique years that are in the database (for specific locationId)
+     */
+    public Cursor queryAllYears(long locationID) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%Y', measurement_timestamp_fmt)) AS year"},
+                MEASUREMENT_LOCATION + "=?", new String[]{String.valueOf(locationID)},
+                null, null, null);
+    }
+
+    /**
+     * SQL query that returns the unique calendar weeks that are in the database (for specific locationId)
+     */
+    public Cursor queryAllWeeks(long locationID, String year) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=?";
+        return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%W', measurement_timestamp_fmt)) AS week"},
+                whereString, new String[]{String.valueOf(locationID), year},
+                null, null, null);
+    }
+
+    /**
+     * SQL query that returns the unique months with measurements of a specific year and locationId
+     */
+    public Cursor queryAllMonths(long locationID, String year) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=?";
+        return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%m', measurement_timestamp_fmt)) AS month"},
+                whereString, new String[]{String.valueOf(locationID), year},
+                null, null, null);
+    }
+
+    /**
+     * SQL query that returns the unique days with measurements of a specific year and month and locationId
+     */
+    public Cursor queryAllDays(long locationID, String year, String month) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=? AND strftime('%m', measurement_timestamp_fmt)=?";
+        return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%d', measurement_timestamp_fmt)) AS day"},
+                whereString, new String[]{String.valueOf(locationID), year, month},
+                null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of one specific day for one locationID
+     */
+    public Cursor queryDay(long locationID, String year, String month, String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        String tmpDay = year + "-" + month + "-" + day + " 00:00:00";
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND date(measurement_timestamp_fmt)=date(?)",
+                new String[]{String.valueOf(locationID), tmpDay}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of one specific calendar week for one year and locationID
+     */
+    public Cursor queryWeek(long locationID, String year, String week) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=strftime('%Y',?) AND strftime('%W', measurement_timestamp_fmt)=?",
+                new String[]{String.valueOf(locationID), year, week}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of one specific month for one year and locationID
+     */
+    public Cursor queryMonth(long locationID, String year, String month) {
+        SQLiteDatabase db = getWritableDatabase();
+        String tmpMonth = year + "-" + month + "-01 00:00:00";
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND strftime('%Y-%m', measurement_timestamp_fmt)=strftime('%Y-%m',?)",
+                new String[]{String.valueOf(locationID), tmpMonth}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of one specific year for one locationID
+     */
+    public Cursor queryYear(long locationID, String year) {
+        SQLiteDatabase db = getWritableDatabase();
+        String tmpYear = year + "-01-01 00:00:00";
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=strftime('%Y',?)",
+                new String[]{String.valueOf(locationID), tmpYear}, null, null, null);
     }
 }

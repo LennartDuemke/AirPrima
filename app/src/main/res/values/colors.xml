@@ -3,4 +3,10 @@
     <color name="colorPrimary">#03A9F4</color>
     <color name="colorPrimaryDark">#007FB8</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="colorButtonBarInactive">#A5FFF6</color>
+    <color name="colorButtonBarActive">#6AE4D6</color>
+
+    <color name="colorPageIndicatorSelected">#636464</color>
+    <color name="colorPageIndicatorUnselected">#CFCFCF</color>
 </resources>

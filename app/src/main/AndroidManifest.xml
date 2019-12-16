@@ -50,6 +50,14 @@
                 android:value=".LocationsActivity" />
         </activity>
 
+        <activity android:name=".VisualizationActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
     </application>
 
 </manifest>

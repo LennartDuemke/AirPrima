@@ -27,7 +27,6 @@ public class EditLocationActivity extends AppCompatActivity {
     private final int maxFreq = 60;
     private DatabaseHandler dbHandler;
     private Bundle bundle;
-    private Location location;
 
     private TextView title;
     private EditText edit1;
@@ -97,7 +96,7 @@ public class EditLocationActivity extends AppCompatActivity {
                 // Update DB
                 String name = edit1.getText().toString();
                 int freq = Integer.parseInt(edit2.getText().toString());
-                dbHandler.insertLocation(new Location(name, freq));
+                dbHandler.insertLocation(name, freq);
 
                 // Close activity
                 finish();
@@ -133,13 +132,12 @@ public class EditLocationActivity extends AppCompatActivity {
             cursor.moveToFirst();
             String locationName = cursor.getString(cursor.getColumnIndex("location_name"));
             int locationMeasureFreq = cursor.getInt(cursor.getColumnIndex("location_measuring_freq"));
-            location = new Location(id, locationName, locationMeasureFreq);
             cursor.close();
 
             // Update Views
-            title.setText(location.getName());
-            edit1.setText(location.getName());
-            edit2.setText(String.valueOf(location.getMeasuringFreq()));
+            title.setText(locationName);
+            edit1.setText(locationName);
+            edit2.setText(String.valueOf(locationMeasureFreq));
 
             // Register listeners
             // Save
@@ -153,9 +151,9 @@ public class EditLocationActivity extends AppCompatActivity {
                     }
 
                     // Update DB
-                    location.setName(edit1.getText().toString());
-                    location.setMeasuringFreq(Integer.parseInt(edit2.getText().toString()));
-                    dbHandler.updateLocation(location);
+                    String name = edit1.getText().toString();
+                    int freq = Integer.parseInt(edit2.getText().toString());
+                    dbHandler.updateLocation(id, name, freq);
 
                     // Close activity
                     finish();
@@ -183,7 +181,7 @@ public class EditLocationActivity extends AppCompatActivity {
                     adb.setPositiveButton(R.string.yes, new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
 
-                            dbHandler.deleteLocation(location.getId());
+                            dbHandler.deleteLocation(id);
                             // Close activity
                             finish();
                         }

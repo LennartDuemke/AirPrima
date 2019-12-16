@@ -44,7 +44,9 @@ public class LocationsActivity extends AppCompatActivity {
 
         // Database handler
         dbHandler = new DatabaseHandler(this);
-        //dbHandler.dropAllAndCreateNew();
+
+        // Reset location table
+        //dbHandler.dropLocationAndCreateNew();
 
         // Setup ListView
         ca = new LocationsCursorAdapter(this);
@@ -57,8 +59,12 @@ public class LocationsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast.makeText(view.getContext(), "Pressed item Id = " + id, Toast.LENGTH_SHORT).show();
-                // TODO: Open activity that visualizes the sensor readings
+                //Toast.makeText(view.getContext(), "Pressed item Id = " + id, Toast.LENGTH_SHORT).show();
+
+                Intent intentVisualize = new Intent();
+                intentVisualize.setClass(view.getContext(), VisualizationActivity.class);
+                intentVisualize.putExtra("id", id);
+                startActivity(intentVisualize);
             }
         });
     }

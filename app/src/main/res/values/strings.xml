@@ -3,8 +3,19 @@
 
     <string name="save">Speichern</string>
     <string name="cancel">Abbrechen</string>
+    <string name="select">Auswählen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="finedust">Feinstaub</string>
+    <string name="temperature">Temperatur</string>
+    <string name="humidity">Luftfeuchtigkeit</string>
+    <string name="overview">Übersicht</string>
+    <string name="day">Tag</string>
+    <string name="calendar_week">Kalenderwoche</string>
+    <string name="calendar_week_shortform">KW</string>
+    <string name="week">Woche</string>
+    <string name="month">Monat</string>
+    <string name="year">Jahr</string>
 
     <string name="menu_info">Info</string>
     <string name="menu_home">Home</string>
@@ -32,5 +43,21 @@
     <string name="location_edit_empty_name">Der Standortname darf nicht leer sein!</string>
     <string name="location_edit_empty_freq">Die Messhäufigkeit darf nicht leer sein!</string>
     <string name="location_edit_freq_range">Die Messhäufigkeit darf nur zwischen 2min und 60min sein!</string>
+
+    <string name="overview_pm2_5">PM 2.5\n%1$d</string>
+    <string name="overview_pm10">PM 10\n%1$d</string>
+    <string name="overview_temp">Temp\n%1$d</string>
+    <string name="overview_humid">Feuchte\n%1$d</string>
+
+    <string name="development_title_day">%1$s Tagesentwicklung</string>
+    <string name="development_title_week">%1$s Wochenentwicklung</string>
+    <string name="development_title_month">%1$s Monatsentwicklung</string>
+    <string name="development_title_year">%1$s Jahresentwicklung</string>
+    <string name="development_date_button_empty">%1$s...</string>
+
+    <string name="dialog_datepicker_title_day">Wählen Sie einen Tag aus:</string>
+    <string name="dialog_datepicker_title_week">Wählen Sie eine Kalenderwoche aus:</string>
+    <string name="dialog_datepicker_title_month">Wählen Sie einen Monat aus:</string>
+    <string name="dialog_datepicker_title_year">Wählen Sie ein Jahr aus:</string>
 
 </resources>
