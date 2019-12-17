@@ -24,7 +24,7 @@ public class DatepickerDialog extends Dialog {
     private Activity activity;
     private Date dateEnum;
     private DatabaseHandler dbHandler;
-    private long locationID = 0;
+    private long locationID;
     private DatepickerListener listener;
 
     private TextView title;
@@ -34,8 +34,9 @@ public class DatepickerDialog extends Dialog {
     private Spinner spinnerMonthWeek;
     private Spinner spinnerDay;
     private TextView monthWeekTitle;
-    private Button cancel;
     private Button select;
+    private TextView noDataText;
+    private LinearLayout spinnerContainer;
 
     private boolean initSelectSpinnerYear = true;
     private boolean initSelectSpinnerMonth = true;
@@ -43,7 +44,7 @@ public class DatepickerDialog extends Dialog {
     /**
      * Constructor
      */
-    public DatepickerDialog(Activity activity, Date dateEnum, long locationID) {
+    DatepickerDialog(Activity activity, Date dateEnum, long locationID) {
         super(activity);
         this.activity = activity;
         this.dateEnum = dateEnum;
@@ -66,8 +67,13 @@ public class DatepickerDialog extends Dialog {
         spinnerMonthWeek = findViewById(R.id.dialog_datepicker_spinner_month);
         spinnerDay = findViewById(R.id.dialog_datepicker_spinner_day_week);
         monthWeekTitle = findViewById(R.id.dialog_datepicker_month_week_title);
-        cancel = findViewById(R.id.dialog_datepicker_cancel);
+        Button cancel = findViewById(R.id.dialog_datepicker_cancel);
         select = findViewById(R.id.dialog_datepicker_select);
+        spinnerContainer = findViewById(R.id.dialog_datepicker_spinner_container);
+
+        // Text that will be shown, when DB is empty for specific locationID
+        noDataText = findViewById(R.id.dialog_datepicker_no_data_text);
+        noDataText.setVisibility(View.GONE);
 
         dbHandler = new DatabaseHandler(activity);
 
@@ -95,16 +101,9 @@ public class DatepickerDialog extends Dialog {
     }
 
     /**
-     * Getter for the listener
-     */
-    public DatepickerListener getListener() {
-        return listener;
-    }
-
-    /**
      * Setter for the listener
      */
-    public void setListener(DatepickerListener listener) {
+    void setListener(DatepickerListener listener) {
         this.listener = listener;
     }
 
@@ -126,14 +125,21 @@ public class DatepickerDialog extends Dialog {
         column3.setVisibility(View.GONE);
 
         queryAndAddYears();
+        if (spinnerYear.getCount() != 0) {
 
-        select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()), null, null, null);
-                closeDialog();
-            }
-        });
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()), null, null, null);
+                    closeDialog();
+                }
+            });
+
+        } else {
+            spinnerContainer.setVisibility(View.GONE);
+            noDataText.setVisibility(View.VISIBLE);
+            select.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -146,37 +152,44 @@ public class DatepickerDialog extends Dialog {
         column3.setVisibility(View.GONE);
 
         queryAndAddYears();
-        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-        queryAndAddWeeks(tmpYear);
+        if (spinnerYear.getCount() != 0) {
 
-        select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()),
-                        String.valueOf(spinnerMonthWeek.getSelectedItem()), null, null);
-                closeDialog();
-            }
-        });
+            String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+            queryAndAddWeeks(tmpYear);
 
-        // When user changes the year, the calendar weeks have to be looked up in DB
-        spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-
-                if(!initSelectSpinnerYear) {
-                    String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-                    queryAndAddWeeks(tmpYear);
-                } else {
-                    initSelectSpinnerYear = false;
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()),
+                            String.valueOf(spinnerMonthWeek.getSelectedItem()), null, null);
+                    closeDialog();
                 }
-            }
+            });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
+            // When user changes the year, the calendar weeks have to be looked up in DB
+            spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-        });
+                    if (!initSelectSpinnerYear) {
+                        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+                        queryAndAddWeeks(tmpYear);
+                    } else {
+                        initSelectSpinnerYear = false;
+                    }
+                }
 
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                }
+
+            });
+
+        } else {
+            spinnerContainer.setVisibility(View.GONE);
+            noDataText.setVisibility(View.VISIBLE);
+            select.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -189,36 +202,44 @@ public class DatepickerDialog extends Dialog {
         column3.setVisibility(View.GONE);
 
         queryAndAddYears();
-        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-        queryAndAddMonths(tmpYear);
+        if (spinnerYear.getCount() != 0) {
 
-        select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()),null,
-                        String.valueOf(spinnerMonthWeek.getSelectedItem()), null);
-                closeDialog();
-            }
-        });
+            String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+            queryAndAddMonths(tmpYear);
 
-        // When user changes the year, the months have to be looked up in DB
-        spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-
-                if(!initSelectSpinnerYear) {
-                    String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-                    queryAndAddMonths(tmpYear);
-                } else {
-                    initSelectSpinnerYear = false;
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()), null,
+                            String.valueOf(spinnerMonthWeek.getSelectedItem()), null);
+                    closeDialog();
                 }
-            }
+            });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
+            // When user changes the year, the months have to be looked up in DB
+            spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-        });
+                    if (!initSelectSpinnerYear) {
+                        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+                        queryAndAddMonths(tmpYear);
+                    } else {
+                        initSelectSpinnerYear = false;
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                }
+
+            });
+
+        } else {
+            spinnerContainer.setVisibility(View.GONE);
+            noDataText.setVisibility(View.VISIBLE);
+            select.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -229,60 +250,68 @@ public class DatepickerDialog extends Dialog {
         title.setText(R.string.dialog_datepicker_title_day);
 
         queryAndAddYears();
-        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-        queryAndAddMonths(tmpYear);
-        String tmpMonth = String.valueOf(spinnerMonthWeek.getSelectedItem());
-        queryAndAddDays(tmpYear, tmpMonth);
+        if (spinnerYear.getCount() != 0) {
 
-        select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()),null,
-                        String.valueOf(spinnerMonthWeek.getSelectedItem()), String.valueOf(spinnerDay.getSelectedItem()));
-                closeDialog();
-            }
-        });
+            String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+            queryAndAddMonths(tmpYear);
+            String tmpMonth = String.valueOf(spinnerMonthWeek.getSelectedItem());
+            queryAndAddDays(tmpYear, tmpMonth);
 
-        // When user changes the year, the months and days have to be looked up in DB
-        spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-
-                if(!initSelectSpinnerYear) {
-                    String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-                    queryAndAddMonths(tmpYear);
-                    String tmpMonth = String.valueOf(spinnerMonthWeek.getSelectedItem());
-                    queryAndAddDays(tmpYear, tmpMonth);
-                } else {
-                    initSelectSpinnerYear = false;
+            select.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()), null,
+                            String.valueOf(spinnerMonthWeek.getSelectedItem()), String.valueOf(spinnerDay.getSelectedItem()));
+                    closeDialog();
                 }
-            }
+            });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
+            // When user changes the year, the months and days have to be looked up in DB
+            spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-        });
-
-        // When user changes the month, the days have to be looked up in DB
-        spinnerMonthWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-
-                if(!initSelectSpinnerMonth) {
-                    String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
-                    String tmpMonth = String.valueOf(spinnerMonthWeek.getSelectedItem());
-                    queryAndAddDays(tmpYear, tmpMonth);
-                } else {
-                    initSelectSpinnerMonth = false;
+                    if (!initSelectSpinnerYear) {
+                        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+                        queryAndAddMonths(tmpYear);
+                        String tmpMonth = String.valueOf(spinnerMonthWeek.getSelectedItem());
+                        queryAndAddDays(tmpYear, tmpMonth);
+                    } else {
+                        initSelectSpinnerYear = false;
+                    }
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-            }
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                }
 
-        });
+            });
+
+            // When user changes the month, the days have to be looked up in DB
+            spinnerMonthWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+
+                    if (!initSelectSpinnerMonth) {
+                        String tmpYear = String.valueOf(spinnerYear.getSelectedItem());
+                        String tmpMonth = String.valueOf(spinnerMonthWeek.getSelectedItem());
+                        queryAndAddDays(tmpYear, tmpMonth);
+                    } else {
+                        initSelectSpinnerMonth = false;
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                }
+
+            });
+
+        } else {
+            spinnerContainer.setVisibility(View.GONE);
+            noDataText.setVisibility(View.VISIBLE);
+            select.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -302,7 +331,7 @@ public class DatepickerDialog extends Dialog {
                     yearList.add(tmpYear);
                 }
 
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(activity,
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(activity,
                         android.R.layout.simple_spinner_item, yearList);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerYear.setAdapter(dataAdapter);
@@ -329,13 +358,13 @@ public class DatepickerDialog extends Dialog {
                     String tmpWeek = cursor.getString(cursor.getColumnIndex("week"));
                     int weekInt = Integer.parseInt(tmpWeek);
                     weekInt++;                                  // Add 1 because the weeks start at 0
-                    if(weekInt < 10) {
-                        tmpWeek = "0" + String.valueOf(weekInt);
+                    if (weekInt < 10) {
+                        tmpWeek = "0" + weekInt;
                     }
                     weekList.add(tmpWeek);
                 }
 
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(activity,
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(activity,
                         android.R.layout.simple_spinner_item, weekList);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonthWeek.setAdapter(dataAdapter);
@@ -363,7 +392,7 @@ public class DatepickerDialog extends Dialog {
                     monthList.add(tmpMonth);
                 }
 
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(activity,
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(activity,
                         android.R.layout.simple_spinner_item, monthList);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerMonthWeek.setAdapter(dataAdapter);
@@ -391,7 +420,7 @@ public class DatepickerDialog extends Dialog {
                     dayList.add(tmpDay);
                 }
 
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(activity,
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(activity,
                         android.R.layout.simple_spinner_item, dayList);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerDay.setAdapter(dataAdapter);

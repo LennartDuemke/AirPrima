@@ -59,5 +59,6 @@
     <string name="dialog_datepicker_title_week">Wählen Sie eine Kalenderwoche aus:</string>
     <string name="dialog_datepicker_title_month">Wählen Sie einen Monat aus:</string>
     <string name="dialog_datepicker_title_year">Wählen Sie ein Jahr aus:</string>
+    <string name="dialog_datepicker_no_data">Für diesen Standort gibt es noch keine Messwerte!</string>
 
 </resources>

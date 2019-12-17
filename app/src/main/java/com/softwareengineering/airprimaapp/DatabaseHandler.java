@@ -276,7 +276,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public Cursor queryAllDays(long locationID, String year, String month) {
         SQLiteDatabase db = getWritableDatabase();
-        String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=? AND strftime('%m', measurement_timestamp_fmt)=?";
+        String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=? AND " +
+                "strftime('%m', measurement_timestamp_fmt)=?";
         return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%d', measurement_timestamp_fmt)) AS day"},
                 whereString, new String[]{String.valueOf(locationID), year, month},
                 null, null, null);
@@ -301,7 +302,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
-                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=strftime('%Y',?) AND strftime('%W', measurement_timestamp_fmt)=?",
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=? AND " +
+                        "strftime('%W', measurement_timestamp_fmt)=?",
                 new String[]{String.valueOf(locationID), year, week}, null, null, null);
     }
 
@@ -327,5 +329,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
                 "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=strftime('%Y',?)",
                 new String[]{String.valueOf(locationID), tmpYear}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of the newest day for one locationID
+     */
+    public Cursor queryNewestDay(long locationID) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND date(measurement_timestamp_fmt)=date((SELECT " +
+                        "max(measurement_timestamp_fmt) from measurement))",
+                new String[]{String.valueOf(locationID)}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of the newest calendar week for one locationID
+     */
+    public Cursor queryNewestWeek(long locationID) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)" +
+                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement)) AND" +
+                        " strftime('%W', measurement_timestamp_fmt)=strftime('%W',(SELECT max(measurement_timestamp_fmt)" +
+                        " from measurement))",
+                new String[]{String.valueOf(locationID)}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of the newest month for one locationID
+     */
+    public Cursor queryNewestMonth(long locationID) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND strftime('%Y-%m', measurement_timestamp_fmt)" +
+                        "=strftime('%Y-%m',(SELECT max(measurement_timestamp_fmt) from measurement))",
+                new String[]{String.valueOf(locationID)}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns all the measurements of the newest year for one locationID
+     */
+    public Cursor queryNewestYear(long locationID) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
+                        MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)" +
+                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement))",
+                new String[]{String.valueOf(locationID)}, null, null, null);
     }
 }

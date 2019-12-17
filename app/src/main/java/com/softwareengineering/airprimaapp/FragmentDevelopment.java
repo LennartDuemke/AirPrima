@@ -8,10 +8,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.anychart.APIlib;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
@@ -20,8 +22,6 @@ import com.anychart.charts.Cartesian;
 import com.anychart.core.cartesian.series.Line;
 import com.anychart.data.Mapping;
 import com.anychart.data.Set;
-import com.anychart.enums.Anchor;
-import com.anychart.enums.MarkerType;
 import com.anychart.scales.DateTime;
 
 import java.util.ArrayList;
@@ -38,17 +38,20 @@ public class FragmentDevelopment extends Fragment {
     private ProgressBar progressBar;
 
     private DatabaseHandler dbHandler;
+
     private List<String> timestampList = new ArrayList<>();
     private List<Double> pm2_5List = new ArrayList<>();
     private List<Double> pm10List = new ArrayList<>();
     private List<Double> tempList = new ArrayList<>();
     private List<Double> humidList = new ArrayList<>();
 
+    private Cartesian cartesian;
+    private Set set;
+
     private long locationID;
     private Sensor sensorType;
     private Date dateType;
-
-    private Cartesian cartesian;
+    private boolean init = true;
 
     /**
      * Method to initialize fragment
@@ -82,8 +85,10 @@ public class FragmentDevelopment extends Fragment {
 
         fragmentTitle = view.findViewById(R.id.development_title);
         datePickerButton = view.findViewById(R.id.development_date_button);
-        anyChartView = view.findViewById(R.id.development_diagram);
         progressBar = view.findViewById(R.id.development_progressbar);
+
+        anyChartView = view.findViewById(R.id.development_diagram);
+        APIlib.getInstance().setActiveAnyChartView(anyChartView);   // Nothing works without this ¯\(°_o)/¯ ????
 
         dbHandler = new DatabaseHandler(view.getContext());
 
@@ -174,8 +179,7 @@ public class FragmentDevelopment extends Fragment {
 
         setupDiagram();
         setupButtonListener();
-
-        // TODO DB look up data for newest measurements...
+        lookUpDateAndFillList(true, null, null, null, null);   // Newest measurements
     }
 
     /**
@@ -195,11 +199,13 @@ public class FragmentDevelopment extends Fragment {
 
         // Setup for the cartesian coordinate system of the diagram
         cartesian = AnyChart.line();
+        cartesian.xScale(DateTime.instantiate());   // Makes the x axis a date-time axis (uses date strings)
         cartesian.animation(true);
         cartesian.padding(5d, 15d, 50d, 5d);        // Distance to monitor sides
         cartesian.crosshair().enabled(false);       // Vertical line that appears when user presses on data
         cartesian.xAxis(0).labels().padding(5d, 5d, 5d, 5d);
-        cartesian.xScale(DateTime.instantiate());   // Makes the x axis a date-time axis - uses date strings
+
+        set = Set.instantiate();
     }
 
     /**
@@ -229,7 +235,7 @@ public class FragmentDevelopment extends Fragment {
                                 setDateButton(year);
                                 break;
                         }
-                        lookUpDateAndFillList(year, week, month, day);
+                        lookUpDateAndFillList(false, year, week, month, day);
                     }
                 });
                 dialog.show();
@@ -240,25 +246,48 @@ public class FragmentDevelopment extends Fragment {
     }
 
     /**
-     * Looks up the date from the date picker and fills measurement lists
+     * Looks up the date from the date picker and fills measurement lists OR Looks up the newest measurements in the DB
      */
-    private void lookUpDateAndFillList(String year, String week, String month, String day) {
+    private void lookUpDateAndFillList(boolean newest, String year, String week, String month, String day) {
+
+        timestampList.clear();
+        pm2_5List.clear();
+        pm10List.clear();
+        tempList.clear();
+        humidList.clear();
 
         Cursor cursor = null;
 
-        switch(dateType) {
-            case DAY:
-                cursor = dbHandler.queryDay(locationID, year, month, day);
-                break;
-            case WEEK:
-                cursor = dbHandler.queryWeek(locationID, year, week);
-                break;
-            case MONTH:
-                cursor = dbHandler.queryMonth(locationID, year, month);
-                break;
-            case YEAR:
-                cursor = dbHandler.queryYear(locationID, year);
-                break;
+        if(newest) {
+            switch(dateType) {
+                case DAY:
+                    cursor = dbHandler.queryNewestDay(locationID);
+                    break;
+                case WEEK:
+                    cursor = dbHandler.queryNewestWeek(locationID);
+                    break;
+                case MONTH:
+                    cursor = dbHandler.queryNewestMonth(locationID);
+                    break;
+                case YEAR:
+                    cursor = dbHandler.queryNewestYear(locationID);
+                    break;
+            }
+        } else {
+            switch(dateType) {
+                case DAY:
+                    cursor = dbHandler.queryDay(locationID, year, month, day);
+                    break;
+                case WEEK:
+                    cursor = dbHandler.queryWeek(locationID, year, week);
+                    break;
+                case MONTH:
+                    cursor = dbHandler.queryMonth(locationID, year, month);
+                    break;
+                case YEAR:
+                    cursor = dbHandler.queryYear(locationID, year);
+                    break;
+            }
         }
 
         if (cursor != null) {
@@ -288,17 +317,16 @@ public class FragmentDevelopment extends Fragment {
                             break;
                     }
                 }
-
             } finally {
                 cursor.close();
             }
         }
-
         generateDiagram();
-
     }
 
     private void generateDiagram() {
+
+        APIlib.getInstance().setActiveAnyChartView(anyChartView);   // Nothing works without this ¯\(°_o)/¯ ????
 
         List<DataEntry> seriesData = new ArrayList<>();
 
@@ -320,38 +348,33 @@ public class FragmentDevelopment extends Fragment {
                 break;
         }
 
-        Set set = Set.instantiate();
+        // Draw the diagram
         set.data(seriesData);
-        Mapping series1Mapping = set.mapAs("{ x: 'x', value: 'value' }");
-        //Mapping series2Mapping = set.mapAs("{ x: 'x', value: 'value2' }");
 
-        Line series1 = cartesian.line(series1Mapping);
-        series1.name("Brandy");
-        series1.hovered().markers().enabled(true);
-        series1.hovered().markers()
-                .type(MarkerType.CIRCLE)
-                .size(4d);
-        series1.tooltip()
-                .position("right")
-                .anchor(Anchor.LEFT_CENTER)
-                .offsetX(5d)
-                .offsetY(5d);
+        if(init) {
+            init = false;
 
-        /*if(sensorType == Sensor.FINEDUST) {
-            Line line2 = cartesian.line(series2Mapping);
-            series1.name("Brandy");
-            series1.hovered().markers().enabled(true);
-            series1.hovered().markers()
-                    .type(MarkerType.CIRCLE)
-                    .size(4d);
-            series1.tooltip()
-                    .position("right")
-                    .anchor(Anchor.LEFT_CENTER)
-                    .offsetX(5d)
-                    .offsetY(5d);
-        }*/
+            Mapping series1Mapping = set.mapAs("{ x: 'x', value: 'value' }");
+            Line series1 = cartesian.line(series1Mapping);
+            series1.stroke("rgb(235, 5, 189)");
+            series1.name("PM2.5");
+            series1.markers().enabled(false);
+            series1.tooltip().enabled(false);
 
-        anyChartView.setChart(cartesian);
+            if(sensorType == Sensor.FINEDUST) {
+                Mapping series2Mapping = set.mapAs("{ x: 'x', value: 'value2' }");
+                Line series2 = cartesian.line(series2Mapping);
+                series2.stroke("rgb(3, 148, 13)");
+                series2.name("PM10");
+                series2.markers().enabled(false);
+                series2.tooltip().enabled(false);
+                cartesian.legend().enabled(true);
+                cartesian.legend().fontSize(13d);
+                cartesian.legend().padding(0d, 0d, 10d, 0d);
+            }
+
+            anyChartView.setChart(cartesian);
+        }
     }
 
     private class CustomDataEntry extends ValueDataEntry {
