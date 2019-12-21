@@ -160,8 +160,16 @@ public class DatepickerDialog extends Dialog {
             select.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String tmpWeek = String.valueOf(spinnerMonthWeek.getSelectedItem());
+                    int weekInt = Integer.parseInt(tmpWeek);
+                    weekInt--;
+                    if (weekInt < 10) {
+                        tmpWeek = "0" + weekInt;
+                    } else {
+                        tmpWeek = String.valueOf(weekInt);
+                    }
                     listener.dialogValueReturn(String.valueOf(spinnerYear.getSelectedItem()),
-                            String.valueOf(spinnerMonthWeek.getSelectedItem()), null, null);
+                            tmpWeek, null, null);
                     closeDialog();
                 }
             });
@@ -360,6 +368,8 @@ public class DatepickerDialog extends Dialog {
                     weekInt++;                                  // Add 1 because the weeks start at 0
                     if (weekInt < 10) {
                         tmpWeek = "0" + weekInt;
+                    } else {
+                        tmpWeek = String.valueOf(weekInt);
                     }
                     weekList.add(tmpWeek);
                 }

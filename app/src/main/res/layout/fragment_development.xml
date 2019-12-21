@@ -2,43 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:background="@android:color/white">
 
-    <LinearLayout
-        android:id="@+id/development_upper_part"
+    <TextView
+        android:id="@+id/development_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:orientation="horizontal">
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="Luftfeuchtigkeits Tagesentwicklung"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/development_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:text="Feinstaub Tagesentwicklung"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/development_date_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableEnd="@drawable/ic_date_range_black_24dp"
-            android:text="21.10.2015" />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/development_date_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/development_title"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:drawableEnd="@drawable/ic_date_range_black_24dp"
+        android:drawablePadding="5dp"
+        android:text="21.10.2015" />
 
     <com.anychart.AnyChartView
         android:id="@+id/development_diagram"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/development_upper_part"
+        android:layout_below="@+id/development_title"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
@@ -48,10 +42,22 @@
         android:id="@+id/development_progressbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/development_upper_part"
+        android:layout_below="@+id/development_title"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="140dp" />
+
+    <TextView
+        android:id="@+id/development_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/development_title"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="@string/development_no_data"
+        android:textSize="30sp" />
 
 </RelativeLayout>

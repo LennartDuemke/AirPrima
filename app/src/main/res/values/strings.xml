@@ -17,6 +17,19 @@
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
 
+    <string name="january_short">Jan.</string>
+    <string name="february_short">Feb.</string>
+    <string name="march_short">März</string>
+    <string name="april_short">Apr.</string>
+    <string name="may_short">Mai</string>
+    <string name="june_short">Jun.</string>
+    <string name="july_short">Jul.</string>
+    <string name="august_short">Aug.</string>
+    <string name="september_short">Sept.</string>
+    <string name="october_short">Okt.</string>
+    <string name="november_short">Nov.</string>
+    <string name="december_short">Dez.</string>
+
     <string name="menu_info">Info</string>
     <string name="menu_home">Home</string>
 
@@ -54,6 +67,7 @@
     <string name="development_title_month">%1$s Monatsentwicklung</string>
     <string name="development_title_year">%1$s Jahresentwicklung</string>
     <string name="development_date_button_empty">%1$s...</string>
+    <string name="development_no_data">Keine Messungen!</string>
 
     <string name="dialog_datepicker_title_day">Wählen Sie einen Tag aus:</string>
     <string name="dialog_datepicker_title_week">Wählen Sie eine Kalenderwoche aus:</string>
