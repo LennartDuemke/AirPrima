@@ -88,4 +88,7 @@
     <string name="finedust_startpage_2_5">\n%1$d µg/m³</string>
     <string name="finedust_startpage_10">\n%1$d µg/m³</string>
 
+    <string name="ger_t_ausw_hlen">Gerät auswählen</string>
+    <string name="neues_ger_t_koppeln">Neues Gerät koppeln</string>
+
 </resources>

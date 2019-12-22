@@ -213,6 +213,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
+     * Deletes a measurement in the table "measurement"
+     */
+    public void deleteMobileMeasurements() {
+        SQLiteDatabase db = getWritableDatabase();
+        int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_LOCATION + " = 1000", null);
+    }
+
+    /**
      * SQL query that returns a Cursor with all the locations (sorted)
      */
     Cursor queryLocations() {
