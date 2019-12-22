@@ -1,57 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".FragmentOverview"
+    android:id="@+id/overview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_overview"
     android:orientation="vertical"
-    android:id="@+id/overview"
-    android:background="#FF0505" >
+    tools:context=".FragmentOverview">
 
-    <LinearLayout
-        android:gravity="center"
-        android:layout_weight="1"
+    <TextView
+        android:id="@+id/overview_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/overview_title"
+        android:textSize="27sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/overview_upper_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/pm2_5"
+            android:id="@+id/overview_pm2_5"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="wrap_content" />
+            android:text="@string/overview_pm2_5"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/pm10"
+            android:id="@+id/overview_pm10"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="wrap_content" />
+            android:text="@string/overview_pm10"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/overview_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
         android:gravity="center"
-        android:layout_weight="1"
+        android:text="@string/no_measurements"
+        android:textSize="27sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/overview_lower_part"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/temp"
+            android:id="@+id/overview_temp"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="wrap_content" />
+            android:text="@string/overview_temp"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/humid"
+            android:id="@+id/overview_humid"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="wrap_content" />
+            android:text="@string/overview_humid"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

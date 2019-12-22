@@ -27,7 +27,7 @@ class ViewPagerAdapterHumidity extends FragmentStatePagerAdapter {
     public Fragment getItem(int i) {
         switch(i) {
             case 0:
-                return new FragmentHumidityStartpage();
+                return FragmentHumidityStartpage.newInstance(locationID);
             case 1:
                 return FragmentDevelopment.newInstance(locationID, Sensor.HUMIDITY, Date.DAY);
             case 2:
@@ -37,7 +37,7 @@ class ViewPagerAdapterHumidity extends FragmentStatePagerAdapter {
             case 4:
                 return FragmentDevelopment.newInstance(locationID, Sensor.HUMIDITY, Date.YEAR);
             default:
-                return new FragmentHumidityStartpage();
+                return FragmentHumidityStartpage.newInstance(locationID);
         }
     }
 

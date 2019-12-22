@@ -25,7 +25,7 @@ class ViewPagerAdapterOverview extends FragmentStatePagerAdapter {
      */
     @Override
     public Fragment getItem(int i) {
-        return new FragmentOverview();
+        return FragmentOverview.newInstance(locationID);
     }
 
     /**

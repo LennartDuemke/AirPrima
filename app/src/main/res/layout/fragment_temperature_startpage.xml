@@ -1,25 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".FragmentTemperatureStartpage"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_temperature_startpage"
     android:orientation="vertical"
-    android:background="#B6A0E0" >
+    tools:context=".FragmentTemperatureStartpage">
 
     <TextView
-        android:id="@+id/temp_celsius"
+        android:id="@+id/temperature_startpage_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center" />
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/temperature_startpage_title"
+        android:textSize="27sp"
+        android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/temp_fahrenheit"
+        android:id="@+id/temperature_startpage_celsius"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center" />
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/temperature_startpage_value_celsius"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/temperature_startpage_fahrenheit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/temperature_startpage_value_fahrenheit"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/temperature_startpage_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/no_measurements"
+        android:textSize="27sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

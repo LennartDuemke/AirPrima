@@ -27,7 +27,7 @@ class ViewPagerAdapterFinedust extends FragmentStatePagerAdapter {
     public Fragment getItem(int i) {
         switch(i) {
             case 0:
-                return new FragmentFinedustStartpage();
+                return FragmentFinedustStartpage.newInstance(locationID);
             case 1:
                 return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.DAY);
             case 2:
@@ -37,7 +37,7 @@ class ViewPagerAdapterFinedust extends FragmentStatePagerAdapter {
             case 4:
                 return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.YEAR);
             default:
-                return new FragmentFinedustStartpage();
+                return FragmentFinedustStartpage.newInstance(locationID);
         }
     }
 

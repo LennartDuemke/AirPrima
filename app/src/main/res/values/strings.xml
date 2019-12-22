@@ -16,6 +16,7 @@
     <string name="week">Woche</string>
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
+    <string name="no_measurements">Keine Messungen vorhanden!</string>
 
     <string name="january_short">Jan.</string>
     <string name="february_short">Feb.</string>
@@ -57,11 +58,6 @@
     <string name="location_edit_empty_freq">Die Messhäufigkeit darf nicht leer sein!</string>
     <string name="location_edit_freq_range">Die Messhäufigkeit darf nur zwischen 2min und 60min sein!</string>
 
-    <string name="overview_pm2_5">PM 2.5\n%1$d</string>
-    <string name="overview_pm10">PM 10\n%1$d</string>
-    <string name="overview_temp">Temp\n%1$d</string>
-    <string name="overview_humid">Feuchte\n%1$d</string>
-
     <string name="development_title_day">%1$s Tagesentwicklung</string>
     <string name="development_title_week">%1$s Wochenentwicklung</string>
     <string name="development_title_month">%1$s Monatsentwicklung</string>
@@ -74,5 +70,22 @@
     <string name="dialog_datepicker_title_month">Wählen Sie einen Monat aus:</string>
     <string name="dialog_datepicker_title_year">Wählen Sie ein Jahr aus:</string>
     <string name="dialog_datepicker_no_data">Für diesen Standort gibt es noch keine Messwerte!</string>
+
+    <string name="overview_title">Neuste Messung\n%1$s</string>
+    <string name="overview_pm2_5">PM 2.5\n%1$d</string>
+    <string name="overview_pm10">PM 10\n%1$d</string>
+    <string name="overview_temp">Temperatur\n%1$d</string>
+    <string name="overview_humid">Luftfeuchtigkeit\n%1$d</string>
+
+    <string name="humidity_startpage_title">Luftfeuchtigkeit\n%1$s</string>
+    <string name="humidity_startpage_value">\n%1$d%%</string>
+
+    <string name="temperature_startpage_title">Temperatur\n%1$s</string>
+    <string name="temperature_startpage_value_celsius">\n%1$d°C</string>
+    <string name="temperature_startpage_value_fahrenheit">\n%1$d°F</string>
+
+    <string name="finedust_startpage_title">Feinstaub\n%1$s</string>
+    <string name="finedust_startpage_2_5">\n%1$d µg/m³</string>
+    <string name="finedust_startpage_10">\n%1$d µg/m³</string>
 
 </resources>

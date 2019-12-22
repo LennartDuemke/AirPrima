@@ -27,7 +27,7 @@ class ViewPagerAdapterTemperature extends FragmentStatePagerAdapter {
     public Fragment getItem(int i) {
         switch(i) {
             case 0:
-                return new FragmentTemperatureStartpage();
+                return FragmentTemperatureStartpage.newInstance(locationID);
             case 1:
                 return FragmentDevelopment.newInstance(locationID, Sensor.TEMPERATURE, Date.DAY);
             case 2:
@@ -37,7 +37,7 @@ class ViewPagerAdapterTemperature extends FragmentStatePagerAdapter {
             case 4:
                 return FragmentDevelopment.newInstance(locationID, Sensor.TEMPERATURE, Date.YEAR);
             default:
-                return new FragmentTemperatureStartpage();
+                return FragmentTemperatureStartpage.newInstance(locationID);
         }
     }
 

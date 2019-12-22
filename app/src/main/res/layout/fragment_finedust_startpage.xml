@@ -6,20 +6,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#56FF00" >
+    android:background="@drawable/gradient_finedust_startpage" >
 
     <TextView
-        android:id="@+id/finedust_pm2_5"
+        android:id="@+id/finedust_startpage_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center" />
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/finedust_startpage_title"
+        android:textSize="27sp"
+        android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/finedust_pm10"
+        android:id="@+id/finedust_startpage_2_5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center" />
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/finedust_startpage_2_5"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/finedust_startpage_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/finedust_startpage_10"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/finedust_startpage_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/no_measurements"
+        android:textSize="27sp"
+        android:textStyle="bold" />
 
 </LinearLayout>
