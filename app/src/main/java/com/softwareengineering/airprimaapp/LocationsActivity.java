@@ -64,6 +64,7 @@ public class LocationsActivity extends AppCompatActivity {
                 Intent intentVisualize = new Intent();
                 intentVisualize.setClass(view.getContext(), VisualizationActivity.class);
                 intentVisualize.putExtra("id", id);
+                ClientSocketThread.currentLocation = id;
                 startActivity(intentVisualize);
             }
         });

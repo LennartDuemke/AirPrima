@@ -7,10 +7,13 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-class ClientSocketThread extends Thread {
+/**
+ * Get bluetooth socket instance for client
+ */
+public class ClientSocketThread extends Thread {
 
     private static final String TAG = ClientSocketThread.class.getSimpleName();
-    public static long currentLocation = -1;
+    static long currentLocation = -1;
 
     private BluetoothSocket socket;
 
@@ -28,6 +31,9 @@ class ClientSocketThread extends Thread {
         }
     }
 
+    /**
+     * Thread logic
+     */
     @Override
     public void run() {
         try {
@@ -37,15 +43,17 @@ class ClientSocketThread extends Thread {
         }
     }
 
-    public BluetoothSocket getSocket() {
+    /**
+     * Get bluetooth socket
+     */
+    BluetoothSocket getSocket() {
         return socket;
     }
-
 
     /**
      * Cancel bluetooth connection
      */
-    public void cancel() {
+    void cancel() {
         if (socket != null) {
             try {
                 socket.close();

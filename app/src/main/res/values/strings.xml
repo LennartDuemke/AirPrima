@@ -17,6 +17,7 @@
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
     <string name="no_measurements">Keine Messungen vorhanden!</string>
+    <string name="connecting">Verbinden</string>
 
     <string name="january_short">Jan.</string>
     <string name="february_short">Feb.</string>
@@ -88,7 +89,8 @@
     <string name="finedust_startpage_2_5">\n%1$d µg/m³</string>
     <string name="finedust_startpage_10">\n%1$d µg/m³</string>
 
-    <string name="ger_t_ausw_hlen">Gerät auswählen</string>
-    <string name="neues_ger_t_koppeln">Neues Gerät koppeln</string>
+    <string name="bluetooth_choose_device">Gerät auswählen</string>
+    <string name="bluetooth_pair_new_device">Neues Gerät koppeln</string>
+    <string name="bluetooth_not_active">Geräte konnten nicht geladen werden, da Bluetooth nicht aktiviert ist.</string>
 
 </resources>

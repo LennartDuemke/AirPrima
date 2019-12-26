@@ -32,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
         mobileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                Intent connectIntent = new Intent(v.getContext(), ConnectActivity.class);
+                connectIntent.putExtra("mode", "mobile");
+                startActivity(connectIntent);
             }
         });
 

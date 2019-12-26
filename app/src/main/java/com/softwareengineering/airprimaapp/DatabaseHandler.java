@@ -178,23 +178,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Updates a measurement in the table "measurement"
-     */
-    public void updateMeasurement(long id, long timestamp, String timestampFmt, float pm2_5, float pm10, float temp, float hum, long locationId) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(MEASUREMENT_TIMESTAMP, timestamp);
-        values.put(MEASUREMENT_TIMESTAMP_FMT, timestampFmt);
-        values.put(MEASUREMENT_PM_2_5, pm2_5);
-        values.put(MEASUREMENT_PM_10, pm10);
-        values.put(MEASUREMENT_TEMP, temp);
-        values.put(MEASUREMENT_HUM, hum);
-        values.put(MEASUREMENT_LOCATION, locationId);
-        int numUpdated = db.update(TABLE_MEASUREMENT, values, MEASUREMENT_ID + " = ?", new String[]{Long.toString(id)});
-        Log.d(TAG, "DB - updateMeasurement(): id = " + id + " -> " + numUpdated);
-    }
-
-    /**
      * Deletes a location in the table "location"
      */
     void deleteLocation(long id) {
@@ -206,18 +189,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Deletes a measurement in the table "measurement"
      */
-    public void deleteMeasurement(long id) {
+    void deleteMeasurement(long id) {
         SQLiteDatabase db = getWritableDatabase();
         int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_ID + " = ?", new String[]{Long.toString(id)});
         Log.d(TAG, "DB - deleteMeasurement(): id = " + id + " -> " + numDeleted);
     }
 
     /**
-     * Deletes a measurement in the table "measurement"
+     * Deletes the mobile measurements that do not have to be saved
      */
-    public void deleteMobileMeasurements() {
+    void deleteAllMobileMeasurements() {
         SQLiteDatabase db = getWritableDatabase();
-        int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_LOCATION + " = 1000", null);
+        int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_LOCATION + " = ?",
+                new String[]{String.valueOf(ConnectActivity.MOBILE_MEASUREMENT_ID)});
+        Log.d(TAG, "DB - deleteAllMobileMeasurements(): count -> " + numDeleted);
     }
 
     /**
@@ -230,12 +215,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * SQL query that returns a Cursor with all the measurements (sorted)
+     * SQL query that returns the newest timestamp for one locationID
      */
-    public Cursor queryMeasurements() {
+    Cursor queryNewestTimestamp(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
-        return db.query(TABLE_MEASUREMENT, null, null, null,
-                null, null, MEASUREMENT_TIMESTAMP + " DESC");
+        return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP},
+                "measurement_location=? AND measurement_timestamp_fmt=(Select max(measurement_timestamp_fmt)" +
+                        " from measurement)",
+                new String[]{String.valueOf(locationID)}, null, null, null);
     }
 
     /**

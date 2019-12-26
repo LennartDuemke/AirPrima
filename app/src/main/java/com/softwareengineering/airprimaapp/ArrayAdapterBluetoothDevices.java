@@ -12,18 +12,26 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-
+/**
+ * Adapter for the bluetooth devices activity
+ */
 public class ArrayAdapterBluetoothDevices extends ArrayAdapter<String> {
 
     private Context mContext;
     private int mResource;
 
-    public ArrayAdapterBluetoothDevices(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
+    /**
+     * Constructor
+     */
+    ArrayAdapterBluetoothDevices(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
         super(context, resource, objects);
         mContext = context;
         mResource = resource;
     }
 
+    /**
+     * Returns the view of a list item
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -31,11 +39,10 @@ public class ArrayAdapterBluetoothDevices extends ArrayAdapter<String> {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mResource, parent, false);
 
-        TextView tvName = (TextView) convertView.findViewById(R.id.textBT);
+        TextView tvName = convertView.findViewById(R.id.item_connect_text);
+        tvName.setText(getItem(position));
 
         convertView.setOnClickListener((View.OnClickListener) mContext);
-
-        tvName.setText(getItem(position));
 
         return convertView;
     }

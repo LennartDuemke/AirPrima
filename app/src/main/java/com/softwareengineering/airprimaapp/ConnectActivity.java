@@ -1,8 +1,7 @@
 package com.softwareengineering.airprimaapp;
 
-import androidx.appcompat.app.ActionBar;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -28,37 +27,45 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
+import java.util.Date;
 
-public class ActivityConnect extends AppCompatActivity implements View.OnClickListener {
+/**
+ * Activity that lets the user connect to a sensor station via bluetooth or pair with it
+ */
+public class ConnectActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = ConnectActivity.class.getSimpleName();
 
     private static final int REQUEST_ENABLE_BT = 123;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 321;
-    private static final String TAG = ActivityConnect.class.getSimpleName();
     private static final UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
-    private static final int MOBILE_MEASUREMENT_ID = 1000;
-    private Thread clientThread;
+    static final int MOBILE_MEASUREMENT_ID = 4000;
 
-    ProgressDialog progressDialog;
-
+    private ProgressDialog progressDialog;
     private BluetoothAdapter adapter;
-    private boolean started;
-    ArrayList<String> deviceList;
-    ListView listView;
+    private ArrayList<String> deviceList;
+    private ListView listView;
 
-    Context context;
+    private Context context;
 
 
+    /**
+     * Setup for the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
 
         // Find view instances
-        Button pairButton = findViewById(R.id.pairNewDevice_button);
+        Button pairButton = findViewById(R.id.connect_button);
 
         // Register event listeners
         pairButton.setOnClickListener(new View.OnClickListener() {
@@ -87,38 +94,6 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
 
 
     /**
-     * Create the options menu (ActionBar)
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    /**
-     * Handling click events of menu
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.item_home:    // Home button
-                Intent homeIntent = new Intent(this, MainActivity.class);
-                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeIntent);
-                return true;
-            case R.id.item_info:    // Information button
-                Intent informationIntent = new Intent(this, InformationActivity.class);
-                startActivity(informationIntent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-    /**
      * Result of bluetooth permission request
      */
     @Override
@@ -128,7 +103,7 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
             showDevices();
         }
         else {
-            Toast.makeText(this, "Geräte konnten nicht geladen werden, da Bluetooth nicht aktiviert ist.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.bluetooth_not_active, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -137,7 +112,7 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
      * Show paired bluetooth devices
      */
     private void showDevices() {
-        boolean enabled = false;
+        boolean enabled;
         adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter != null) {
             enabled = adapter.isEnabled();
@@ -157,7 +132,7 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
 
 
     /**
-     * Bluetooth connection with airprima station
+     * Bluetooth connection with AirPrima sensor station
      */
     private Thread createAndStartThread(final ClientSocketThread t) {
         Thread workerThread = new Thread() {
@@ -173,11 +148,11 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
 
                     Intent intent = getIntent();
                     String mode = intent.getStringExtra("mode");
-                    Log.e(TAG, String.format("MODE -------------------> %s", mode));
+                    Log.d(TAG, String.format("MODE -------------------> %s", mode));
 
                     if (socket != null) {
 
-                        //OutputStream erstellen
+                        // create OutputStream
                         Log.d(TAG, String.format("connection type %d for %s", socket.getConnectionType(), t.getName()));
                         OutputStream _os = null;
                         try {
@@ -188,10 +163,10 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
                         final OutputStream os = _os;
                         InputStream is = socket.getInputStream();
 
-                        //Gerät fragen, ob es eine Sensorstation ist
+                        // Ask device if it is an AirPrima sensor station
                         send(os, "Hallo. Bist du eine AirPrima Station ?");
 
-                        //Der Sensorstation 3 Sekunden Zeit zum Antworten geben
+                        // The sensor station has 3 seconds to answer
                         sleep(3000);
 
                         stopLoading();
@@ -199,32 +174,35 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
                         DatabaseHandler dbHandler;
                         dbHandler = new DatabaseHandler(context);
 
-                        //Nachricht  auswerten
+                        // Analyse message
                         String txt = receive(is);
                         if (txt != null) {
-                            //Bluetooth Gerät bestätigt, dass es eine AirPrima Station ist
+
+                            // It is an AirPrima sensor station
                             if (txt.equals("Ja, bin ich.")) {
-                                Log.e(TAG, "Bestätigung erhalten.");
+                                Log.d(TAG, "Confirmation received.");
 
 
                                 int locationTransFreq = 3;
 
                                 if (mode.equals("mobile")) {
-                                    dbHandler.deleteMobileMeasurements();
+                                    dbHandler.deleteAllMobileMeasurements();
 
                                     ClientSocketThread.currentLocation = MOBILE_MEASUREMENT_ID;
 
-                                    Intent viewIntent = new Intent(context, VisualizationActivity.class);
-                                    startActivity(viewIntent);
+                                    Intent intentVisualize = new Intent();
+                                    intentVisualize.setClass(context, VisualizationActivity.class);
+                                    intentVisualize.putExtra("id", MOBILE_MEASUREMENT_ID);
+                                    startActivity(intentVisualize);
                                 }
                                 else if (mode.equals("stationary")) {
                                     Intent viewIntent = new Intent(context, LocationsActivity.class);
                                     startActivity(viewIntent);
 
-                                    //Warten bis der User einen Standort ausgewählt hat
+                                    // Wait till user has chosen a location
                                     while (ClientSocketThread.currentLocation == -1) {
                                         sleep(1000);
-                                        Log.e(TAG, "Und ich warte.");
+                                        Log.d(TAG, "Waiting for user to choose location.");
                                     }
 
                                     Cursor cursor = dbHandler.querySpecificLocation(ClientSocketThread.currentLocation);
@@ -242,40 +220,40 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
                                 txt = receive(is);
 
                                 if (txt.equals("Initialisierung erfolgreich.")) {
-                                    Log.e(TAG, "Initialisierung erfolgreich.");
+                                    Log.d(TAG, "Initialization successful.");
                                 }
                                 else {
                                     keepRunning = false;
-                                    Log.e(TAG, "Initialisierung fehlgeschlagen.");
+                                    Log.e(TAG, "Initialization failed.");
                                 }
                             }
                         }
                         while (keepRunning) {
-                            //Daten empfangen
+                            // Receive data
                             txt = receive(is);
 
                             if (txt != null) {
-                                Log.e(TAG, "Nachricht: " + txt);
+                                Log.d(TAG, "Message: " + txt);
 
                                 if (txt.equals("Deine Datenbank ist aktuell."))  {
                                     sleep(10000);
                                 }
                                 else if (txt.matches(".*MEASUREMENT;.*")) {
                                     String[] measurement = txt.split(";");
-                                    /*dbHandler.insertMeasurement(
-                                            Integer.parseInt(measurement[1]),
+                                    dbHandler.insertMeasurement(
+                                            Long.parseLong(measurement[1]),
+                                            unixTimestampToSQLiteTimestring(measurement[1]),
                                             Float.parseFloat(measurement[2]),
                                             Float.parseFloat(measurement[3]),
                                             Float.parseFloat(measurement[4]),
                                             Float.parseFloat(measurement[5]),
                                             Long.parseLong(measurement[6])
-                                    );*/ //TODO Hier muss noch was angepasst werden
+                                    );
                                 }
                             }
 
 
-
-                            Cursor cursor = dbHandler.queryMeasurements();
+                            Cursor cursor = dbHandler.queryNewestTimestamp(ClientSocketThread.currentLocation);
                             if(cursor != null) {
                                 // Get data from cursor
                                 cursor.moveToFirst();
@@ -288,13 +266,13 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
                         }
                     }
                     else {
-                        Log.e(TAG, "BT Socket ist leer.");
+                        Log.e(TAG, "Bluetooth socket is empty.");
                     }
                 } catch (InterruptedException | IOException e) {
                     Log.e(TAG, null, e);
                     keepRunning = false;
                 } finally {
-                    Log.d(TAG, "calling cancel() of " + t.getName());
+                    Log.d(TAG, "Calling cancel() of " + t.getName());
                     t.cancel();
                 }
             }
@@ -303,23 +281,34 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
         return workerThread;
     }
 
+    /**
+     * Converts an Unix timestamp to a SQlite timestring
+     */
+    private String unixTimestampToSQLiteTimestring(String timestamp) {
+        long tmpTimestamp = Long.parseLong(timestamp);
+        Date date = new Date((long)tmpTimestamp*1000); // Needs milliseconds and not seconds
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(date);
+    }
+
 
     /**
-     * Send string to airprima station
+     * Send string to AirPrima station
      */
     private void send(OutputStream os, String text) {
         try {
             os.write(text.getBytes());
         } catch (IOException e) {
-            Log.e(TAG, "error while sending", e);
+            Log.e(TAG, "Error while sending", e);
         }
     }
 
 
     /**
-     * Receive string from airprima station
-     * @param in
-     * @return
+     * Receive string from AirPrima station
      */
     private String receive(InputStream in) {
         try {
@@ -332,7 +321,7 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
                 }
             }
         } catch (IOException e) {
-            Log.e(TAG, "receive()", e);
+            Log.e(TAG, "Receive()", e);
         }
         return null;
     }
@@ -343,12 +332,13 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
      */
     @Override
     public void onClick(View v) {
+
         if (v.getId() == R.id.layoutBT) {
-            TextView tv = v.findViewById(R.id.textBT);
+            TextView tv = v.findViewById(R.id.item_connect_text);
             String station = tv.getText().toString();
 
 
-            progressDialog.setMessage("Verbinden");
+            progressDialog.setMessage(getString(R.string.connecting));
             progressDialog.show();
 
             BluetoothDevice remoteDevice = null;
@@ -356,13 +346,13 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
             for (BluetoothDevice device : devices) {
                 if (station.equals(device.getName())) {
                     remoteDevice = device;
-                    Log.e(TAG, "Gerät: " + remoteDevice.getName());
+                    Log.d(TAG, "Device: " + remoteDevice.getName());
 
                 }
             }
             if (remoteDevice != null) {
                 ClientSocketThread clientSocketThread = new ClientSocketThread(remoteDevice, MY_UUID);
-                clientThread = createAndStartThread(clientSocketThread);
+                Thread clientThread = createAndStartThread(clientSocketThread);
             }
         }
     }
@@ -372,5 +362,35 @@ public class ActivityConnect extends AppCompatActivity implements View.OnClickLi
      */
     void stopLoading() {
         progressDialog.dismiss();
+    }
+
+    /**
+     * Create the options menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Handling click events of menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.item_home:    // Home button
+                Intent homeIntent = new Intent(this, MainActivity.class);
+                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(homeIntent);
+                return true;
+            case R.id.item_info:    // Information button
+                Intent informationIntent = new Intent(this, InformationActivity.class);
+                startActivity(informationIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
