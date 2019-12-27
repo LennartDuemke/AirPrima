@@ -25,17 +25,17 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="@string/finedust_startpage_2_5"
-        android:textSize="50sp"
+        android:textSize="45sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/finedust_startpage_10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:gravity="center_horizontal"
         android:text="@string/finedust_startpage_10"
-        android:textSize="50sp"
+        android:textSize="45sp"
         android:textStyle="bold" />
 
     <TextView

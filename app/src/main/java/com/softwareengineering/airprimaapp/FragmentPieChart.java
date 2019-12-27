@@ -393,12 +393,12 @@ public class FragmentPieChart extends Fragment {
             }
         }
 
-        chartData.add(new ValueDataEntry(getString(R.string.pie_chart_good), goodDaysCount));
-        chartData.add(new ValueDataEntry(getString(R.string.pie_chart_fair), fairDaysCount));
-        chartData.add(new ValueDataEntry(getString(R.string.pie_chart_moderate), moderateDaysCount));
-        chartData.add(new ValueDataEntry(getString(R.string.pie_chart_poor), poorDaysCount));
-        chartData.add(new ValueDataEntry(getString(R.string.pie_chart_very_poor), veryPoorDaysCount));
-        chartData.add(new ValueDataEntry(getString(R.string.pie_chart_extremely_poor), extremelyPoorDaysCount));
+        chartData.add(new ValueDataEntry(getString(R.string.good), goodDaysCount));
+        chartData.add(new ValueDataEntry(getString(R.string.fair), fairDaysCount));
+        chartData.add(new ValueDataEntry(getString(R.string.moderate), moderateDaysCount));
+        chartData.add(new ValueDataEntry(getString(R.string.poor), poorDaysCount));
+        chartData.add(new ValueDataEntry(getString(R.string.very_poor), veryPoorDaysCount));
+        chartData.add(new ValueDataEntry(getString(R.string.extremely_poor), extremelyPoorDaysCount));
 
         // Draw the diagram
         pie.data(chartData);

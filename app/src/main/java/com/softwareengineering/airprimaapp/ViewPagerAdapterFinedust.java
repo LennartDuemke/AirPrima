@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
  */
 class ViewPagerAdapterFinedust extends FragmentStatePagerAdapter {
 
-    private int fragmentCount = 7;
+    private int fragmentCount = 8;
     private long locationID;
 
     /**
@@ -29,16 +29,18 @@ class ViewPagerAdapterFinedust extends FragmentStatePagerAdapter {
             case 0:
                 return FragmentFinedustStartpage.newInstance(locationID);
             case 1:
-                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.DAY);
+                return FragmentEAQIClassification.newInstance(locationID);
             case 2:
-                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.WEEK);
+                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.DAY);
             case 3:
-                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.MONTH);
+                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.WEEK);
             case 4:
-                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.YEAR);
+                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.MONTH);
             case 5:
-                return FragmentPieChart.newInstance(locationID, false);
+                return FragmentDevelopment.newInstance(locationID, Sensor.FINEDUST, Date.YEAR);
             case 6:
+                return FragmentPieChart.newInstance(locationID, false);
+            case 7:
                 return FragmentPieChart.newInstance(locationID, true);
             default:
                 return FragmentFinedustStartpage.newInstance(locationID);

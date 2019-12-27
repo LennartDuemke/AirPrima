@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context=".FragmentEAQIClassification">
+
+    <TextView
+        android:id="@+id/eaqi_classification_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="@string/eaqi_classification_title"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/eaqi_classification_2_5_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/eaqi_classification_pm_2_5"
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/eaqi_classification_2_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="4 µg/m³"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/eaqi_classification_10_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="@string/eaqi_classification_pm_10"
+        android:textSize="22sp" />
+
+    <TextView
+        android:id="@+id/eaqi_classification_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center_horizontal"
+        android:text="20 µg/m³"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TableLayout
+        android:id="@+id/eaqi_classification_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+
+        <TableRow>
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_eaqi_level"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/pm_2_5"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/pm_10"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow android:background="@color/good">
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/good"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_2_5_good" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_10_good" />
+        </TableRow>
+
+        <TableRow android:background="@color/fair">
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/fair"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_2_5_fair" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_10_fair" />
+        </TableRow>
+
+        <TableRow android:background="@color/moderate">
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/moderate"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_2_5_moderate" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_10_moderate" />
+        </TableRow>
+
+        <TableRow android:background="@color/poor">
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/poor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_2_5_poor" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_10_poor" />
+        </TableRow>
+
+        <TableRow android:background="@color/very_poor">
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/very_poor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_2_5_very_poor" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_10_very_poor" />
+        </TableRow>
+
+        <TableRow android:background="@color/extremely_poor">
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/extremely_poor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_2_5_extremely_poor" />
+
+            <TextView
+                android:layout_weight="1"
+                android:padding="3dip"
+                android:text="@string/eaqi_classification_pm_10_extremely_poor" />
+        </TableRow>
+
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/eaqi_classification_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/no_data"
+        android:textSize="30sp" />
+
+</LinearLayout>

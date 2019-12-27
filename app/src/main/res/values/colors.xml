@@ -9,4 +9,11 @@
 
     <color name="colorPageIndicatorSelected">#636464</color>
     <color name="colorPageIndicatorUnselected">#CFCFCF</color>
+
+    <color name="good">#50f0e6</color>
+    <color name="fair">#50ccaa</color>
+    <color name="moderate">#f3eb6a</color>
+    <color name="poor">#ff5050</color>
+    <color name="very_poor">#960032</color>
+    <color name="extremely_poor">#7d2181</color>
 </resources>

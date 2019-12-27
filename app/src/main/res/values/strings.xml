@@ -6,17 +6,28 @@
     <string name="select">Auswählen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="connecting">Verbinden</string>
+
     <string name="finedust">Feinstaub</string>
+    <string name="pm_2_5">PM 2.5</string>
+    <string name="pm_10">PM 10</string>
     <string name="temperature">Temperatur</string>
     <string name="humidity">Luftfeuchtigkeit</string>
     <string name="overview">Übersicht</string>
+
     <string name="day">Tag</string>
     <string name="calendar_week">Kalenderwoche</string>
     <string name="calendar_week_shortform">KW</string>
     <string name="week">Woche</string>
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
-    <string name="connecting">Verbinden</string>
+
+    <string name="good">Gut</string>
+    <string name="fair">Angemessen</string>
+    <string name="moderate">Mäßig</string>
+    <string name="poor">Schlecht</string>
+    <string name="very_poor">Sehr Schlecht</string>
+    <string name="extremely_poor">Extrem Schlecht</string>
 
     <string name="no_measurements">Keine Messungen vorhanden!</string>
     <string name="no_data">Keine Messwerte!</string>
@@ -80,15 +91,15 @@
     <string name="overview_humid">Luftfeuchtigkeit\n%1$d</string>
 
     <string name="humidity_startpage_title">Luftfeuchtigkeit\n%1$s</string>
-    <string name="humidity_startpage_value">\n%1$d%%</string>
+    <string name="humidity_startpage_value">%1$d%%</string>
 
     <string name="temperature_startpage_title">Temperatur\n%1$s</string>
-    <string name="temperature_startpage_value_celsius">\n%1$d°C</string>
-    <string name="temperature_startpage_value_fahrenheit">\n%1$d°F</string>
+    <string name="temperature_startpage_value_celsius">%1$d°C</string>
+    <string name="temperature_startpage_value_fahrenheit">%1$d°F</string>
 
     <string name="finedust_startpage_title">Feinstaub\n%1$s</string>
-    <string name="finedust_startpage_2_5">\n%1$d µg/m³</string>
-    <string name="finedust_startpage_10">\n%1$d µg/m³</string>
+    <string name="finedust_startpage_2_5">PM 2.5\n%1$d µg/m³</string>
+    <string name="finedust_startpage_10">PM 10\n%1$d µg/m³</string>
 
     <string name="bluetooth_choose_device">Gerät auswählen</string>
     <string name="bluetooth_pair_new_device">Neues Gerät koppeln</string>
@@ -96,12 +107,22 @@
 
     <string name="pie_chart_title">%1$s - Einordnung der Tage im Jahr\n[European Air Quality Index]</string>
     <string name="pie_chart_legend_name">EAQI Level</string>
-    <string name="pie_chart_good">Gut</string>
-    <string name="pie_chart_fair">Angemessen</string>
-    <string name="pie_chart_moderate">Mäßig</string>
-    <string name="pie_chart_poor">Schlecht</string>
-    <string name="pie_chart_very_poor">Sehr Schlecht</string>
-    <string name="pie_chart_extremely_poor">Extrem Schlecht</string>
 
+    <string name="eaqi_classification_title">Neuste Messung in EAQI eingeordnet [%1$s]</string>
+    <string name="eaqi_classification_pm_2_5">PM 2.5 Wert - %1$s</string>
+    <string name="eaqi_classification_pm_10">PM 10 Wert - %1$s</string>
+    <string name="eaqi_classification_eaqi_level">EAQI Level</string>
+    <string name="eaqi_classification_pm_2_5_good">0-10</string>
+    <string name="eaqi_classification_pm_2_5_fair">10-20</string>
+    <string name="eaqi_classification_pm_2_5_moderate">20-25</string>
+    <string name="eaqi_classification_pm_2_5_poor">25-50</string>
+    <string name="eaqi_classification_pm_2_5_very_poor">50-75</string>
+    <string name="eaqi_classification_pm_2_5_extremely_poor">75-800</string>
+    <string name="eaqi_classification_pm_10_good">0-20</string>
+    <string name="eaqi_classification_pm_10_fair">20-40</string>
+    <string name="eaqi_classification_pm_10_moderate">40-50</string>
+    <string name="eaqi_classification_pm_10_poor">50-100</string>
+    <string name="eaqi_classification_pm_10_very_poor">100-150</string>
+    <string name="eaqi_classification_pm_10_extremely_poor">150-1200</string>
 
 </resources>
