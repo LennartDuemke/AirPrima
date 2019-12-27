@@ -46,7 +46,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
     private static final int REQUEST_ENABLE_BT = 123;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 321;
     private static final UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
-    static final int MOBILE_MEASUREMENT_ID = 4000;
+    static final int MOBILE_MEASUREMENT_ID = 1000;
 
     private ProgressDialog progressDialog;
     private BluetoothAdapter adapter;
