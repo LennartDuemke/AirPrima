@@ -16,8 +16,11 @@
     <string name="week">Woche</string>
     <string name="month">Monat</string>
     <string name="year">Jahr</string>
-    <string name="no_measurements">Keine Messungen vorhanden!</string>
     <string name="connecting">Verbinden</string>
+
+    <string name="no_measurements">Keine Messungen vorhanden!</string>
+    <string name="no_data">Keine Messwerte!</string>
+    <string name="date_button_empty">%1$s...</string>
 
     <string name="january_short">Jan.</string>
     <string name="february_short">Feb.</string>
@@ -63,8 +66,6 @@
     <string name="development_title_week">%1$s Wochenentwicklung</string>
     <string name="development_title_month">%1$s Monatsentwicklung</string>
     <string name="development_title_year">%1$s Jahresentwicklung</string>
-    <string name="development_date_button_empty">%1$s...</string>
-    <string name="development_no_data">Keine Messungen!</string>
 
     <string name="dialog_datepicker_title_day">Wählen Sie einen Tag aus:</string>
     <string name="dialog_datepicker_title_week">Wählen Sie eine Kalenderwoche aus:</string>
@@ -92,5 +93,15 @@
     <string name="bluetooth_choose_device">Gerät auswählen</string>
     <string name="bluetooth_pair_new_device">Neues Gerät koppeln</string>
     <string name="bluetooth_not_active">Geräte konnten nicht geladen werden, da Bluetooth nicht aktiviert ist.</string>
+
+    <string name="pie_chart_title">%1$s - Einordnung der Tage im Jahr\n[European Air Quality Index]</string>
+    <string name="pie_chart_legend_name">EAQI Level</string>
+    <string name="pie_chart_good">Gut</string>
+    <string name="pie_chart_fair">Angemessen</string>
+    <string name="pie_chart_moderate">Mäßig</string>
+    <string name="pie_chart_poor">Schlecht</string>
+    <string name="pie_chart_very_poor">Sehr Schlecht</string>
+    <string name="pie_chart_extremely_poor">Extrem Schlecht</string>
+
 
 </resources>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
     <TextView
-        android:id="@+id/development_title"
+        android:id="@+id/pie_chart_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -13,46 +14,45 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="5dp"
         android:gravity="center"
-        android:text="Luftfeuchtigkeits Tagesentwicklung"
+        android:text="@string/pie_chart_title"
         android:textSize="20sp"
         android:textStyle="bold" />
 
     <Button
-        android:id="@+id/development_date_button"
+        android:id="@+id/pie_chart_date_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/development_title"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="10dp"
+        android:layout_below="@+id/pie_chart_title"
+        android:layout_centerHorizontal="true"
         android:drawableEnd="@drawable/ic_date_range_black_24dp"
         android:drawablePadding="5dp"
         android:text="21.10.2015" />
 
     <com.anychart.AnyChartView
-        android:id="@+id/development_diagram"
+        android:id="@+id/pie_chart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/development_title"
+        android:layout_below="@+id/pie_chart_title"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:gravity="center" />
 
     <ProgressBar
-        android:id="@+id/development_progressbar"
+        android:id="@+id/pie_chart_progressbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/development_title"
+        android:layout_below="@+id/pie_chart_title"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="140dp" />
 
     <TextView
-        android:id="@+id/development_no_data"
+        android:id="@+id/pie_chart_no_data"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/development_title"
+        android:layout_below="@+id/pie_chart_title"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"

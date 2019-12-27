@@ -216,16 +216,16 @@ public class FragmentDevelopment extends Fragment {
         if(empty) {
             switch (dateType) {
                 case YEAR:
-                    tmpDate = getString(R.string.development_date_button_empty, getString(R.string.year));
+                    tmpDate = getString(R.string.date_button_empty, getString(R.string.year));
                     break;
                 case MONTH:
-                    tmpDate = getString(R.string.development_date_button_empty, getString(R.string.month));
+                    tmpDate = getString(R.string.date_button_empty, getString(R.string.month));
                     break;
                 case WEEK:
-                    tmpDate = getString(R.string.development_date_button_empty, getString(R.string.week));
+                    tmpDate = getString(R.string.date_button_empty, getString(R.string.week));
                     break;
                 case DAY:
-                    tmpDate = getString(R.string.development_date_button_empty, getString(R.string.day));
+                    tmpDate = getString(R.string.date_button_empty, getString(R.string.day));
                     break;
             }
         } else {
@@ -508,7 +508,7 @@ public class FragmentDevelopment extends Fragment {
                 }
 
                 if(i == timestampList.size() - 1) { // Termination condition: last index reached
-                    tmpTimestamp = previousYear + "-" + previousMonth + "-" + previousDay + " 00:00:00";
+                    tmpTimestamp = previousYear + "-" + previousMonth + "-" + previousDay + " 01:01:01";
                     processedTimestampList.add(tmpTimestamp);
                     switch (sensorType) {
                         case FINEDUST:
