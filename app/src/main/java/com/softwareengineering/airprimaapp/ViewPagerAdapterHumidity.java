@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
  */
 class ViewPagerAdapterHumidity extends FragmentStatePagerAdapter {
 
-    private int fragmentCount = 5;
+    private int fragmentCount = 6;
     private long locationID;
 
     /**
@@ -36,6 +36,8 @@ class ViewPagerAdapterHumidity extends FragmentStatePagerAdapter {
                 return FragmentDevelopment.newInstance(locationID, Sensor.HUMIDITY, Date.MONTH);
             case 4:
                 return FragmentDevelopment.newInstance(locationID, Sensor.HUMIDITY, Date.YEAR);
+            case 5:
+                return FragmentMinMax.newInstance(locationID, Sensor.HUMIDITY);
             default:
                 return FragmentHumidityStartpage.newInstance(locationID);
         }

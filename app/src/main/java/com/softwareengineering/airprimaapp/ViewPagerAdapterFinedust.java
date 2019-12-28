@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
  */
 class ViewPagerAdapterFinedust extends FragmentStatePagerAdapter {
 
-    private int fragmentCount = 8;
+    private int fragmentCount = 9;
     private long locationID;
 
     /**
@@ -42,6 +42,8 @@ class ViewPagerAdapterFinedust extends FragmentStatePagerAdapter {
                 return FragmentPieChart.newInstance(locationID, false);
             case 7:
                 return FragmentPieChart.newInstance(locationID, true);
+            case 8:
+                return FragmentMinMax.newInstance(locationID, Sensor.FINEDUST);
             default:
                 return FragmentFinedustStartpage.newInstance(locationID);
         }

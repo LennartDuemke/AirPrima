@@ -113,8 +113,6 @@ public class FragmentOverview extends Fragment {
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
-                newestM.close();
-
                 viewPM2_5.setText(getString(R.string.overview_pm2_5, pm2_5));
                 viewPM10.setText(getString(R.string.overview_pm10, pm10));
                 viewTemp.setText(getString(R.string.overview_temp, temp));
@@ -127,6 +125,7 @@ public class FragmentOverview extends Fragment {
                 lowerPart.setVisibility(View.GONE);
                 viewNoData.setVisibility(View.VISIBLE);
             }
+            newestM.close();
         }
     }
 }

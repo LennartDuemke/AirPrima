@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="70dp"
-        android:text="@string/humidity_startpage_value"
+        android:text="@string/humidity_value"
         android:textSize="50sp"
         android:textStyle="bold" />
 

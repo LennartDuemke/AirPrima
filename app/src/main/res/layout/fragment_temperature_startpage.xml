@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:gravity="center"
-        android:text="@string/temperature_startpage_value_celsius"
+        android:text="@string/temperature_value_celsius"
         android:textSize="50sp"
         android:textStyle="bold" />
 

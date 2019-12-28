@@ -99,8 +99,6 @@ public class FragmentFinedustStartpage extends Fragment {
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
-                newestM.close();
-
                 viewTitle.setText(getString(R.string.finedust_startpage_title, date));
                 viewPM2_5.setText(getString(R.string.finedust_startpage_2_5, (int)value2_5));
                 viewPM10.setText(getString(R.string.finedust_startpage_10, (int)value10));
@@ -111,6 +109,7 @@ public class FragmentFinedustStartpage extends Fragment {
                 viewPM10.setVisibility(View.GONE);
                 viewNoData.setVisibility(View.VISIBLE);
             }
+            newestM.close();
         }
     }
 }

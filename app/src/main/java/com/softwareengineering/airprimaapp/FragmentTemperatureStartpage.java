@@ -97,10 +97,8 @@ public class FragmentTemperatureStartpage extends Fragment {
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
-                newestM.close();
-
                 viewTitle.setText(getString(R.string.temperature_startpage_title, date));
-                viewTempCelsius.setText(getString(R.string.temperature_startpage_value_celsius, (int)tempCelsius));
+                viewTempCelsius.setText(getString(R.string.temperature_value_celsius, (int)tempCelsius));
                 double tempFahrenheit = (tempCelsius * 9/5) + 32;
                 viewTempFahrenheit.setText(getString(R.string.temperature_startpage_value_fahrenheit, (int)tempFahrenheit));
 
@@ -110,6 +108,7 @@ public class FragmentTemperatureStartpage extends Fragment {
                 viewTempFahrenheit.setVisibility(View.GONE);
                 viewNoData.setVisibility(View.VISIBLE);
             }
+            newestM.close();
         }
     }
 }

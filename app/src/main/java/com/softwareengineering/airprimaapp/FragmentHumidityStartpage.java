@@ -95,16 +95,15 @@ public class FragmentHumidityStartpage extends Fragment {
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
-                newestM.close();
-
                 viewTitle.setText(getString(R.string.humidity_startpage_title, date));
-                viewHumid.setText(getString(R.string.humidity_startpage_value, humid));
+                viewHumid.setText(getString(R.string.humidity_value, humid));
 
             } else {
                 viewTitle.setVisibility(View.GONE);
                 viewHumid.setVisibility(View.GONE);
                 viewNoData.setVisibility(View.VISIBLE);
             }
+            newestM.close();
         }
     }
 }

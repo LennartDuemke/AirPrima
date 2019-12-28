@@ -108,8 +108,6 @@ public class FragmentEAQIClassification extends Fragment {
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
-                newestM.close();
-
                 viewTitle.setText(getString(R.string.eaqi_classification_title, date));
                 viewPM2_5.setText(String.valueOf((int)value2_5));
                 viewPM10.setText(String.valueOf((int)value10));
@@ -125,6 +123,7 @@ public class FragmentEAQIClassification extends Fragment {
                 viewTable.setVisibility(View.GONE);
                 viewNoData.setVisibility(View.VISIBLE);
             }
+            newestM.close();
         }
     }
 

@@ -219,10 +219,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestTimestamp(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP},
                 "measurement_location=? AND measurement_timestamp_fmt=(Select max(measurement_timestamp_fmt)" +
-                        " from measurement)",
-                new String[]{String.valueOf(locationID)}, null, null, null);
+                        " from measurement where measurement_location=?)",
+                new String[]{strLocationID, strLocationID}, null, null, null);
     }
 
     /**
@@ -359,11 +360,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestDay(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
                 "measurement_location=? AND date(measurement_timestamp_fmt)=date((SELECT " +
-                        "max(measurement_timestamp_fmt) from measurement))",
-                new String[]{String.valueOf(locationID)}, null, null,
+                        "max(measurement_timestamp_fmt) from measurement where measurement_location=?))",
+                new String[]{strLocationID, strLocationID}, null, null,
                 MEASUREMENT_TIMESTAMP_FMT + " ASC");
     }
 
@@ -372,13 +374,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestWeek(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
                 "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)" +
-                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement)) AND" +
-                        " strftime('%W', measurement_timestamp_fmt)=strftime('%W',(SELECT max(measurement_timestamp_fmt)" +
-                        " from measurement))",
-                new String[]{String.valueOf(locationID)}, null, null,
+                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement" +
+                        " where measurement_location=?)) AND strftime('%W', measurement_timestamp_fmt)" +
+                        "=strftime('%W',(SELECT max(measurement_timestamp_fmt)" +
+                        " from measurement where measurement_location=?))",
+                new String[]{strLocationID, strLocationID, strLocationID}, null, null,
                 MEASUREMENT_TIMESTAMP_FMT + " ASC");
     }
 
@@ -387,11 +391,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestMonth(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
                 "measurement_location=? AND strftime('%Y-%m', measurement_timestamp_fmt)" +
-                        "=strftime('%Y-%m',(SELECT max(measurement_timestamp_fmt) from measurement))",
-                new String[]{String.valueOf(locationID)}, null, null,
+                        "=strftime('%Y-%m',(SELECT max(measurement_timestamp_fmt) from measurement " +
+                        "where measurement_location=?))",
+                new String[]{strLocationID, strLocationID}, null, null,
                 MEASUREMENT_TIMESTAMP_FMT + " ASC");
     }
 
@@ -400,11 +406,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestYear(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
                 "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)" +
-                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement))",
-                new String[]{String.valueOf(locationID)}, null, null,
+                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement" +
+                        " where measurement_location=?))",
+                new String[]{strLocationID, strLocationID}, null, null,
                 MEASUREMENT_TIMESTAMP_FMT + " ASC");
     }
 
@@ -413,10 +421,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestYearPm2_5(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5},
                 "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)" +
-                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement))",
-                new String[]{String.valueOf(locationID)}, null, null,
+                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement" +
+                        " where measurement_location=?))",
+                new String[]{strLocationID, strLocationID}, null, null,
                 MEASUREMENT_TIMESTAMP_FMT + " ASC");
     }
 
@@ -425,10 +435,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestYearPm10(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_10},
                 "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)" +
-                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement))",
-                new String[]{String.valueOf(locationID)}, null, null,
+                        "=strftime('%Y',(SELECT max(measurement_timestamp_fmt) from measurement" +
+                        " where measurement_location=?))",
+                new String[]{strLocationID, strLocationID}, null, null,
                 MEASUREMENT_TIMESTAMP_FMT + " ASC");
     }
 
@@ -437,13 +449,90 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     Cursor queryNewestMeasurement(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_PM_2_5, MEASUREMENT_PM_10, MEASUREMENT_TEMP,
                 MEASUREMENT_HUM, "strftime('%d', measurement_timestamp_fmt) AS 'day'",
                 "strftime('%m', measurement_timestamp_fmt) AS 'month'",
                 "strftime('%W', measurement_timestamp_fmt) AS 'week'",
                 "strftime('%Y', measurement_timestamp_fmt) AS 'year'"},
                 "measurement_location=? AND measurement_timestamp_fmt=(Select max(measurement_timestamp_fmt)" +
-                        " from measurement)",
-                new String[]{String.valueOf(locationID)}, null, null, null);
+                        " from measurement where measurement_location=?)",
+                new String[]{strLocationID, strLocationID}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns the min and max values for one specific day for one locationID
+     */
+    Cursor queryMinMaxDay(long locationID, String year, String month, String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        String tmpDay = year + "-" + month + "-" + day + " 01:01:01";
+        return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
+                        "min(measurement_pm_2_5) AS 'min2_5'", "max(measurement_pm_10) AS 'max10'",
+                        "min(measurement_pm_10) AS 'min10'", "max(measurement_temp) AS 'maxTemp'",
+                        "min(measurement_temp) AS 'minTemp'", "max(measurement_hum) AS 'maxHum'",
+                        "min(measurement_hum) AS 'minHum'"},
+                "measurement_location=? AND date(measurement_timestamp_fmt)=date(?)",
+                new String[]{String.valueOf(locationID), tmpDay}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns the min and max values for one specific calendar week of one year and locationID
+     */
+    Cursor queryMinMaxWeek(long locationID, String year, String week) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
+                        "min(measurement_pm_2_5) AS 'min2_5'", "max(measurement_pm_10) AS 'max10'",
+                        "min(measurement_pm_10) AS 'min10'", "max(measurement_temp) AS 'maxTemp'",
+                        "min(measurement_temp) AS 'minTemp'", "max(measurement_hum) AS 'maxHum'",
+                        "min(measurement_hum) AS 'minHum'"},
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=? AND " +
+                        "strftime('%W', measurement_timestamp_fmt)=?",
+                new String[]{String.valueOf(locationID), year, week}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns the min and max values for one specific month for one year and locationID
+     */
+    Cursor queryMinMaxMonth(long locationID, String year, String month) {
+        SQLiteDatabase db = getWritableDatabase();
+        String tmpMonth = year + "-" + month + "-01 01:01:01";
+        return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
+                        "min(measurement_pm_2_5) AS 'min2_5'", "max(measurement_pm_10) AS 'max10'",
+                        "min(measurement_pm_10) AS 'min10'", "max(measurement_temp) AS 'maxTemp'",
+                        "min(measurement_temp) AS 'minTemp'", "max(measurement_hum) AS 'maxHum'",
+                        "min(measurement_hum) AS 'minHum'"},
+                "measurement_location=? AND strftime('%Y-%m', measurement_timestamp_fmt)=strftime('%Y-%m',?)",
+                new String[]{String.valueOf(locationID), tmpMonth}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns the min and max values for one specific year for one locationID
+     */
+    Cursor queryMinMaxYear(long locationID, String year) {
+        SQLiteDatabase db = getWritableDatabase();
+        String tmpYear = year + "-01-01 01:01:01";
+        return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
+                        "min(measurement_pm_2_5) AS 'min2_5'", "max(measurement_pm_10) AS 'max10'",
+                        "min(measurement_pm_10) AS 'min10'", "max(measurement_temp) AS 'maxTemp'",
+                        "min(measurement_temp) AS 'minTemp'", "max(measurement_hum) AS 'maxHum'",
+                        "min(measurement_hum) AS 'minHum'"},
+                "measurement_location=? AND strftime('%Y', measurement_timestamp_fmt)=strftime('%Y',?)",
+                new String[]{String.valueOf(locationID), tmpYear}, null, null, null);
+    }
+
+    /**
+     * SQL query that returns the min and max values of the newest day for one locationID
+     */
+    Cursor queryNewestDayMinMax(long locationID) {
+        SQLiteDatabase db = getWritableDatabase();
+        String strLocationID = String.valueOf(locationID);
+        return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
+                        "min(measurement_pm_2_5) AS 'min2_5'", "max(measurement_pm_10) AS 'max10'",
+                        "min(measurement_pm_10) AS 'min10'", "max(measurement_temp) AS 'maxTemp'",
+                        "min(measurement_temp) AS 'minTemp'", "max(measurement_hum) AS 'maxHum'",
+                        "min(measurement_hum) AS 'minHum'"},
+                "measurement_location=? AND date(measurement_timestamp_fmt)=date((SELECT " +
+                        "max(measurement_timestamp_fmt) from measurement where measurement_location=?))",
+                new String[]{strLocationID, strLocationID}, null, null, null);
     }
 }
