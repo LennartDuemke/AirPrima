@@ -7,6 +7,8 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="connecting">Verbinden</string>
+    <string name="scan">Scannen</string>
+    <string name="pair">Koppeln</string>
 
     <string name="finedust">Feinstaub</string>
     <string name="pm_2_5">PM 2.5</string>
@@ -102,9 +104,15 @@
     <string name="finedust_startpage_2_5">PM 2.5\n%1$d µg/m³</string>
     <string name="finedust_startpage_10">PM 10\n%1$d µg/m³</string>
 
-    <string name="bluetooth_choose_device">Gerät auswählen</string>
-    <string name="bluetooth_pair_new_device">Neues Gerät koppeln</string>
-    <string name="bluetooth_not_active">Geräte konnten nicht geladen werden, da Bluetooth nicht aktiviert ist.</string>
+    <string name="bt_connect_title">Mit Sensorstation verbinden</string>
+    <string name="bt_connect_active">Bluetooth ist eingeschaltet</string>
+    <string name="bt_connect_inactive">Bluetooth ist ausgeschaltet</string>
+    <string name="bt_connect_paired_devices">Gekoppelte Geräte</string>
+    <string name="bt_connect_available_devices">Geräte in Reichweite</string>
+    <string name="bt_connect_device_address">[%1$s]</string>
+    <string name="bt_connect_no_geolocation">Standortzugriff ist notwendig!</string>
+    <string name="bt_connect_pairing_success">Koppelung erfolgreich!</string>
+    <string name="bt_connect_pairing_cancel">Koppelung fehlgeschlagen!</string>
 
     <string name="pie_chart_title">%1$s - Einordnung der Tage im Jahr\n[European Air Quality Index]</string>
     <string name="pie_chart_legend_name">EAQI Level</string>

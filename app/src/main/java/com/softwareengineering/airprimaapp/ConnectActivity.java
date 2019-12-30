@@ -1,19 +1,17 @@
 package com.softwareengineering.airprimaapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,117 +22,301 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.Date;
 
 /**
  * Activity that lets the user connect to a sensor station via bluetooth or pair with it
  */
-public class ConnectActivity extends AppCompatActivity implements View.OnClickListener {
+public class ConnectActivity extends AppCompatActivity implements ConnectInterface {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
-
     private static final int REQUEST_ENABLE_BT = 123;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 321;
     private static final UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
     static final int MOBILE_MEASUREMENT_ID = 1000;
 
+    private TextView bluetoothStatusView;
     private ProgressDialog progressDialog;
-    private BluetoothAdapter adapter;
-    private ArrayList<String> deviceList;
-    private ListView listView;
 
+    private ArrayList<BluetoothDevice> pairedDevicesList = new ArrayList<>();
+    private ArrayList<BluetoothDevice> availableDevicesList = new ArrayList<>();
+
+    private BluetoothDevicesAdapter adapterPairedDevices;
+    private BluetoothDevicesAdapter adapterAvailableDevices;
+
+    private BluetoothAdapter bluetoothAdapter;
+    private boolean started;        // Did the discovery of bluetooth devices already start?
+    private Thread clientThread;
     private Context context;
 
+    /**
+     * Listens for available bluetooth devices near the user
+     */
+    private final BroadcastReceiver receiverDeviceFound = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (!availableDevicesList.contains(device)) {
+                    availableDevicesList.add(device);
+                    adapterAvailableDevices.update(availableDevicesList);
+                }
+            }
+        }
+    };
 
     /**
-     * Setup for the activity
+     * Listens if the bluetooth state has changed. Is bluetooth on or off?
+     */
+    private final BroadcastReceiver receiverBTChange = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                switch (state) {
+                    case BluetoothAdapter.STATE_OFF:
+                        turnDiscoveryOffAndClearLists();
+                        break;
+
+                    case BluetoothAdapter.STATE_ON:
+                        availableDevicesList.clear();
+                        adapterAvailableDevices.update(availableDevicesList);
+                        changeStatus(true);
+                        break;
+                }
+            }
+        }
+    };
+
+    /**
+     * On activity construction - setup
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
 
-        // Find view instances
-        Button pairButton = findViewById(R.id.connect_button);
+        context = this;
 
-        // Register event listeners
-        pairButton.setOnClickListener(new View.OnClickListener() {
+        bluetoothStatusView = findViewById(R.id.bt_connect_status);
+        ListView pairedDevicesListView = findViewById(R.id.bt_connect_paired_list);
+        ListView availableDevicesListView = findViewById(R.id.bt_connect_available_list);
+        Button bluetoothScanButtonView = findViewById(R.id.bt_connect_scan);
+        progressDialog = new ProgressDialog(this);
+
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(receiverDeviceFound, filter);
+
+        IntentFilter filter2 = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(receiverBTChange, filter2);
+
+        adapterPairedDevices = new BluetoothDevicesAdapter(this, this, pairedDevicesList, true);
+        adapterAvailableDevices = new BluetoothDevicesAdapter(this, this, availableDevicesList, false);
+        pairedDevicesListView.setAdapter(adapterPairedDevices);
+        availableDevicesListView.setAdapter(adapterAvailableDevices);
+
+        // Click listener when "scan" button gets pressed
+        bluetoothScanButtonView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent viewIntent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
-                startActivity(viewIntent);
+                turnDiscoveryOffAndClearLists();
+                if (isBluetoothEnabled()) {
+                    changeStatus(true);
+                } else {
+                    turnDiscoveryOffAndClearLists();
+                }
             }
         });
+    }
+
+    /**
+     * On activity destruction
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Unregister BroadcastReceiver
+        adapterPairedDevices.onDestroy();
+        adapterAvailableDevices.onDestroy();
+        unregisterReceiver(receiverDeviceFound);
+        unregisterReceiver(receiverBTChange);
+    }
+
+    /**
+     * On activity start
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        bluetoothAdapter = null;
+        started = false;
+        pairedDevicesList.clear();
+        availableDevicesList.clear();
 
         if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_COARSE_LOCATION);
+        } else {
+            if (isBluetoothEnabled()) {
+                changeStatus(true);
+            } else {
+                turnDiscoveryOffAndClearLists();
+            }
         }
-
-        context = this;
-        progressDialog = new ProgressDialog(this);
-
-        deviceList = new ArrayList<>();
-
-        listView = findViewById(R.id.connect_listview);
-        ArrayAdapterBluetoothDevices adapter = new ArrayAdapterBluetoothDevices(this, R.layout.item_connect, deviceList);
-        listView.setAdapter(adapter);
-
-        showDevices();
     }
 
+    /**
+     * On activity pause
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (started) {
+            bluetoothAdapter.cancelDiscovery();
+            started = false;
+        }
+        if (clientThread != null) {
+            clientThread.interrupt();
+            clientThread = null;
+        }
+    }
 
     /**
-     * Result of bluetooth permission request
+     * Users reaction on the request permission dialog
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if ((requestCode == REQUEST_ACCESS_COARSE_LOCATION) && (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            if (isBluetoothEnabled()) {
+                changeStatus(true);
+            } else {
+                turnDiscoveryOffAndClearLists();
+            }
+        } else {
+            finish();
+            Toast.makeText(this, R.string.bt_connect_no_geolocation, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * User reaction on the activate bluetooth dialog
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if ((resultCode == RESULT_OK) && (requestCode == REQUEST_ENABLE_BT)) {
-            showDevices();
-        }
-        else {
-            Toast.makeText(this, R.string.bluetooth_not_active, Toast.LENGTH_LONG).show();
+            changeStatus(true);
+        } else {
+            turnDiscoveryOffAndClearLists();
         }
     }
 
-
     /**
-     * Show paired bluetooth devices
+     * Checks if bluetooth is enabled + gets the Bluetooth adapter
      */
-    private void showDevices() {
-        boolean enabled;
-        adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter != null) {
-            enabled = adapter.isEnabled();
+    private boolean isBluetoothEnabled() {
+        boolean enabled = false;
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null) {
+            enabled = bluetoothAdapter.isEnabled();
             if (!enabled) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
-            else {
-                Set<BluetoothDevice> devices = adapter.getBondedDevices();
-                for (BluetoothDevice device : devices) {
-                    deviceList.add(device.getName());
-                }
-                listView.invalidateViews();
-            }
+        }
+        return enabled;
+    }
+
+    /**
+     * Change the upper visual bluetooth status in the activity. Shows that bluetooth is on or off
+     */
+    private void changeStatus(boolean enabled) {
+        if (enabled) {
+            bluetoothStatusView.setText(R.string.bt_connect_active);
+            bluetoothStatusView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_bluetooth_blue_48dp, 0);
+            insertDevices();
+        } else {
+            bluetoothStatusView.setText(R.string.bt_connect_inactive);
+            bluetoothStatusView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_bluetooth_disabled_grey_48dp, 0);
         }
     }
 
+    /**
+     * Turns the discovery of bluetooth devices off and clears the lists
+     */
+    private void turnDiscoveryOffAndClearLists() {
+        if (started) {
+            bluetoothAdapter.cancelDiscovery();
+            started = false;
+        }
+        changeStatus(false);
+        pairedDevicesList.clear();
+        availableDevicesList.clear();
+        adapterPairedDevices.update(pairedDevicesList);
+        adapterAvailableDevices.update(availableDevicesList);
+    }
 
     /**
-     * Bluetooth connection with AirPrima sensor station
+     * Inserts the (paired) bluetooth devices into the ListViews
      */
-    private Thread createAndStartThread(final ClientSocketThread t) {
+    private void insertDevices() {
+
+        pairedDevicesList.clear();
+
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        pairedDevicesList.addAll(pairedDevices);
+
+        if (started) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+        started = bluetoothAdapter.startDiscovery();
+
+        // Update adapterPairedDevices
+        adapterPairedDevices.update(pairedDevicesList);
+    }
+
+    /**
+     * Called inside the adapter: Turns the discovery off
+     */
+    @Override
+    public void stopDiscovery() {
+        if (started) {
+            bluetoothAdapter.cancelDiscovery();
+            Log.d(TAG, "Cancel BT discovery before connection");
+        }
+    }
+
+    /**
+     * Called inside the adapter: Initiates a bluetooth connection
+     */
+    @Override
+    public void startConnecting(BluetoothDevice btDevice) {
+        if (btDevice != null) {
+            progressDialog.setMessage(getString(R.string.connecting));
+            progressDialog.show();
+            SocketThread clientSocketThread = new ClientSocketThread(btDevice, MY_UUID);
+            clientThread = createAndStartThread(clientSocketThread);
+        }
+    }
+
+    /**
+     * Starts bluetooth connection with AirPrima sensor station
+     */
+    private Thread createAndStartThread(final SocketThread t) {
         Thread workerThread = new Thread() {
             boolean keepRunning = true;
 
@@ -142,7 +324,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
             public void run() {
                 try {
                     t.start();
-                    Log.d(TAG, "joining " + t.getName());
+                    Log.d(TAG, "Joining " + t.getName());
                     t.join();
                     BluetoothSocket socket = t.getSocket();
 
@@ -152,15 +334,15 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
                     if (socket != null) {
 
-                        // create OutputStream
-                        Log.d(TAG, String.format("connection type %d for %s", socket.getConnectionType(), t.getName()));
+                        // Create OutputStream
                         OutputStream _os = null;
                         try {
                             _os = socket.getOutputStream();
                         } catch (IOException e) {
-                            Log.e(TAG, null, e);
+                            Log.e(TAG, "OutputStream null", e);
                         }
                         final OutputStream os = _os;
+
                         InputStream is = socket.getInputStream();
 
                         // Ask device if it is an AirPrima sensor station
@@ -169,7 +351,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                         // The sensor station has 3 seconds to answer
                         sleep(3000);
 
-                        stopLoading();
+                        progressDialog.dismiss();
 
                         DatabaseHandler dbHandler;
                         dbHandler = new DatabaseHandler(context);
@@ -194,8 +376,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                                     intentVisualize.setClass(context, VisualizationActivity.class);
                                     intentVisualize.putExtra("id", MOBILE_MEASUREMENT_ID);
                                     startActivity(intentVisualize);
-                                }
-                                else if (mode.equals("stationary")) {
+                                } else if (mode.equals("stationary")) {
                                     Intent viewIntent = new Intent(context, LocationsActivity.class);
                                     startActivity(viewIntent);
 
@@ -212,7 +393,6 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                                 }
 
 
-
                                 send(os, "INIT;" + ClientSocketThread.currentLocation + ";" + locationTransFreq);
 
                                 sleep(3000);
@@ -221,8 +401,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
                                 if (txt.equals("Initialisierung erfolgreich.")) {
                                     Log.d(TAG, "Initialization successful.");
-                                }
-                                else {
+                                } else {
                                     keepRunning = false;
                                     Log.e(TAG, "Initialization failed.");
                                 }
@@ -235,10 +414,9 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
                             if (txt != null) {
                                 Log.d(TAG, "Message: " + txt);
 
-                                if (txt.equals("Deine Datenbank ist aktuell."))  {
+                                if (txt.equals("Deine Datenbank ist aktuell.")) {
                                     sleep(10000);
-                                }
-                                else if (txt.matches(".*MEASUREMENT;.*")) {
+                                } else if (txt.matches(".*MEASUREMENT;.*")) {
                                     String[] measurement = txt.split(";");
                                     dbHandler.insertMeasurement(
                                             Long.parseLong(measurement[1]),
@@ -254,7 +432,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
 
                             Cursor cursor = dbHandler.queryNewestTimestamp(ClientSocketThread.currentLocation);
-                            if(cursor != null) {
+                            if (cursor != null) {
                                 // Get data from cursor
                                 cursor.moveToFirst();
                                 long timestamp = cursor.getInt(cursor.getColumnIndex("measurement_timestamp"));
@@ -264,9 +442,9 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
 
                             sleep(1000);
                         }
-                    }
-                    else {
+                    } else {
                         Log.e(TAG, "Bluetooth socket is empty.");
+                        progressDialog.dismiss();
                     }
                 } catch (InterruptedException | IOException e) {
                     Log.e(TAG, null, e);
@@ -286,14 +464,13 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
      */
     private String unixTimestampToSQLiteTimestring(String timestamp) {
         long tmpTimestamp = Long.parseLong(timestamp);
-        Date date = new Date((long)tmpTimestamp*1000); // Needs milliseconds and not seconds
+        Date date = new Date((long) tmpTimestamp * 1000); // Needs milliseconds and not seconds
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(date);
     }
-
 
     /**
      * Send string to AirPrima station
@@ -305,7 +482,6 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
             Log.e(TAG, "Error while sending", e);
         }
     }
-
 
     /**
      * Receive string from AirPrima station
@@ -326,44 +502,6 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
         return null;
     }
 
-
-    /**
-     * Handling onclick events
-     */
-    @Override
-    public void onClick(View v) {
-
-        if (v.getId() == R.id.layoutBT) {
-            TextView tv = v.findViewById(R.id.item_connect_text);
-            String station = tv.getText().toString();
-
-
-            progressDialog.setMessage(getString(R.string.connecting));
-            progressDialog.show();
-
-            BluetoothDevice remoteDevice = null;
-            Set<BluetoothDevice> devices = adapter.getBondedDevices();
-            for (BluetoothDevice device : devices) {
-                if (station.equals(device.getName())) {
-                    remoteDevice = device;
-                    Log.d(TAG, "Device: " + remoteDevice.getName());
-
-                }
-            }
-            if (remoteDevice != null) {
-                ClientSocketThread clientSocketThread = new ClientSocketThread(remoteDevice, MY_UUID);
-                Thread clientThread = createAndStartThread(clientSocketThread);
-            }
-        }
-    }
-
-    /**
-     * Remove the progress dialog
-     */
-    void stopLoading() {
-        progressDialog.dismiss();
-    }
-
     /**
      * Create the options menu
      */
@@ -379,7 +517,7 @@ public class ConnectActivity extends AppCompatActivity implements View.OnClickLi
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.item_home:    // Home button
                 Intent homeIntent = new Intent(this, MainActivity.class);
                 homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

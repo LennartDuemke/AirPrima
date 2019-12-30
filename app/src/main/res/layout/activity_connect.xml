@@ -1,31 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ConnectActivity">
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:gravity="center"
-        android:padding="10dp"
-        android:text="@string/bluetooth_choose_device"
-        android:textSize="25sp" />
+        android:text="@string/bt_connect_title"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/bt_connect_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:drawableEnd="@drawable/ic_bluetooth_disabled_grey_48dp"
+        android:gravity="center_vertical"
+        android:text="@string/bt_connect_inactive"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/bt_connect_paired_devices"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <ListView
-        android:id="@+id/connect_listview"
+        android:id="@+id/bt_connect_paired_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/bt_connect_available_devices"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/bt_connect_available_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
     <Button
-        android:id="@+id/connect_button"
+        android:id="@+id/bt_connect_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="30dp"
-        android:text="@string/bluetooth_pair_new_device" />
+        android:layout_margin="10dp"
+        android:text="@string/scan"
+        android:textSize="22sp" />
 
 </LinearLayout>

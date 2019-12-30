@@ -181,7 +181,8 @@ public class EditLocationActivity extends AppCompatActivity {
                     adb.setPositiveButton(R.string.yes, new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
 
-                            dbHandler.deleteLocation(id);
+                            dbHandler.deleteLocationMeasurements(id);   // Delete all measurements of the location
+                            dbHandler.deleteLocation(id);               // Delete location itself
                             // Close activity
                             finish();
                         }

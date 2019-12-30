@@ -8,26 +8,25 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Get bluetooth socket instance for client
+ * Get bluetooth socket instance for bluetooth client
  */
-public class ClientSocketThread extends Thread {
+class ClientSocketThread extends SocketThread {
 
     private static final String TAG = ClientSocketThread.class.getSimpleName();
-    static long currentLocation = -1;
-
     private BluetoothSocket socket;
+    static long currentLocation = -1;   // TODO Relocate
 
     /**
-     * Connect to bluetooth device
+     * Constructor. Creates bluetooth socket
      */
     ClientSocketThread(BluetoothDevice device, UUID uuid) {
         socket = null;
         setName(TAG);
         try {
             socket = device.createRfcommSocketToServiceRecord(uuid);
-            Log.d(TAG, "createRfcommSocketToServiceRecord() created");
+            Log.d(TAG, "createRfcommSocketToServiceRecord() worked.");
         } catch (IOException e) {
-            Log.d(TAG, "createRfcommSocketToServiceRecord() failed", e);
+            Log.e(TAG, "createRfcommSocketToServiceRecord() failed.", e);
         }
     }
 
@@ -46,14 +45,16 @@ public class ClientSocketThread extends Thread {
     /**
      * Get bluetooth socket
      */
-    BluetoothSocket getSocket() {
+    @Override
+    public BluetoothSocket getSocket() {
         return socket;
     }
 
     /**
      * Cancel bluetooth connection
      */
-    void cancel() {
+    @Override
+    public void cancel() {
         if (socket != null) {
             try {
                 socket.close();

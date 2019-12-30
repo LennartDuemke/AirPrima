@@ -187,12 +187,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Deletes a measurement in the table "measurement"
+     * Deletes all measurements that belong to a specific locationID
      */
-    void deleteMeasurement(long id) {
+    void deleteLocationMeasurements(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
-        int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_ID + " = ?", new String[]{Long.toString(id)});
-        Log.d(TAG, "DB - deleteMeasurement(): id = " + id + " -> " + numDeleted);
+        int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_LOCATION + " = ?",
+                new String[]{Long.toString(locationID)});
+        Log.d(TAG, "DB - deleteLocationMeasurements(): locationId = " + locationID + " -> " + numDeleted);
     }
 
     /**
