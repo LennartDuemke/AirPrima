@@ -1,6 +1,10 @@
 package com.softwareengineering.airprimaapp;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -24,6 +28,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -427,6 +433,14 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                                             Float.parseFloat(measurement[5]),
                                             Long.parseLong(measurement[6])
                                     );
+                                    float pm2_5 = Float.parseFloat(measurement[3]);
+                                    float pm10 = Float.parseFloat(measurement[4]);
+                                    if (pm10 > 40.0) {
+                                        notifyUser(pm10, "10");
+                                    }
+                                    if (pm2_5 > 25.0) {
+                                        notifyUser(pm2_5, "2.5");
+                                    }
                                 }
                             }
 
@@ -501,6 +515,29 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
         }
         return null;
     }
+
+
+    /**
+     * Notifies the User
+     */
+    private void notifyUser(float value, String pm) {
+        NotificationChannel channel = new NotificationChannel("channel01", "name", NotificationManager.IMPORTANCE_HIGH);
+
+        // Register channel with system
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+
+        Notification notification = new NotificationCompat.Builder(this, "channel01")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("Kritischer Feinstaubwert")
+                .setContentText("Der PM" + pm + " Wert beträgt " + value + " µg/m3")
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .build();
+
+        notificationManager.notify(0, notification);
+    }
+
 
     /**
      * Create the options menu
