@@ -476,7 +476,7 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
     /**
      * Converts an Unix timestamp to a SQlite timestring
      */
-    private String unixTimestampToSQLiteTimestring(String timestamp) {
+    String unixTimestampToSQLiteTimestring(String timestamp) {
         long tmpTimestamp = Long.parseLong(timestamp);
         Date date = new Date((long) tmpTimestamp * 1000); // Needs milliseconds and not seconds
         Calendar calendar = Calendar.getInstance();
