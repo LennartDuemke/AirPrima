@@ -15,16 +15,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".ProductInformationActivity"></activity>
+        <activity android:name=".ParticulateMatterInfoActivity" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".InformationActivity"
             android:parentActivityName=".MainActivity"
@@ -33,7 +34,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity
             android:name=".StationaryActivity"
             android:parentActivityName=".MainActivity"
@@ -42,7 +42,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity
             android:name=".LocationsActivity"
             android:parentActivityName=".StationaryActivity"
@@ -51,7 +50,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".StationaryActivity" />
         </activity>
-
         <activity
             android:name=".EditLocationActivity"
             android:parentActivityName=".LocationsActivity"
@@ -60,7 +58,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LocationsActivity" />
         </activity>
-
         <activity
             android:name=".VisualizationActivity"
             android:parentActivityName=".MainActivity"
@@ -69,11 +66,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity
             android:name=".ConnectActivity"
             android:screenOrientation="portrait" />
-
     </application>
 
 </manifest>

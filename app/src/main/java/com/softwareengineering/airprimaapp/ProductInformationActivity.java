@@ -1,47 +1,19 @@
 package com.softwareengineering.airprimaapp;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
+public class ProductInformationActivity extends AppCompatActivity {
 
-/**
- * Activity that lets the user choose between the product information and the particulate matter information.
- */
-public class InformationActivity extends AppCompatActivity {
-
-    /**
-     * Setup for the activity
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_information);
-
-        // Find view instances
-        LinearLayout productinfoLayout = findViewById(R.id.information_productinfo);
-        LinearLayout finedustinfoLayout = findViewById(R.id.information_finedustinfo);
-
-        // Register event listeners
-        productinfoLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InformationActivity.this, ProductInformationActivity.class);
-                startActivity(intent);            }
-        });
-
-        finedustinfoLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InformationActivity.this, ParticulateMatterInfoActivity.class);
-                startActivity(intent);
-            }
-        });
+        setContentView(R.layout.activity_product_information);
     }
 
     /**

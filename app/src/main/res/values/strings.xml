@@ -140,5 +140,8 @@
     <string name="min_max_time_period_button">Zeitraum auswählen</string>
     <string name="min_max_finedust_values">PM2.5: %1$d µg/m³\nPM10: %2$d µg/m³</string>
     <string name="dialog_time_period_title">Wählen Sie einen Zeitraum aus:</string>
+    <string name="feinstaub">Feinstaub</string>
+    <string name="feinstaub_bezeichnet_verunreinigungen_in_der_luft_z_b_abgase_pollen_ru_etc_und_setzt_sich_aus_vielen_unterschiedlichen_bestandteilen_zusammen_von_interesse_sind_dabei_besonders_die_feinstaubpartikel_der_gr_e_pm10_und_pm2_5_gr_e_in_m_die_als_gesundheitsgef_hrdend_eingestuft_werden_da_diese_nicht_von_der_nase_abgefangen_werden_und_in_die_bronchien_und_lungenbl_schen_eindringen_k_nnen">Feinstaub bezeichnet Verunreinigungen in der Luft (z.B. Abgase, Pollen, Ruß, etc.) und setzt sich aus vielen unterschiedlichen Bestandteilen zusammen. Von Interesse sind dabei besonders die Feinstaubpartikel der Größe PM10 und PM2.5 (Größe in μm), die als gesundheitsgefährdend eingestuft werden, da diese nicht von der Nase abgefangen werden und in die Bronchien und Lungenbläschen eindringen können.</string>
+    <string name="grenzwerte">Grenzwerte</string>
 
 </resources>
