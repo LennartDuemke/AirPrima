@@ -1,19 +1,17 @@
 package com.softwareengineering.airprimaapp;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * Activity that lets the user choose between the product information and the particulate matter information.
+ * Activity that shows information about the AirPrima product.
  */
-public class InformationActivity extends AppCompatActivity {
+public class ProductInformationActivity extends AppCompatActivity {
 
     /**
      * Setup for the activity
@@ -21,28 +19,7 @@ public class InformationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_information);
-
-        // Find view instances
-        LinearLayout productinfoLayout = findViewById(R.id.information_productinfo);
-        LinearLayout finedustinfoLayout = findViewById(R.id.information_finedustinfo);
-
-        // Register event listeners
-        productinfoLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InformationActivity.this, ProductInformationActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        finedustinfoLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InformationActivity.this, ParticulateMatterInfoActivity.class);
-                startActivity(intent);
-            }
-        });
+        setContentView(R.layout.activity_product_information);
     }
 
     /**
@@ -60,7 +37,7 @@ public class InformationActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        switch(item.getItemId()) {
             case R.id.item_home:    // Home button
                 Intent homeIntent = new Intent(this, MainActivity.class);
                 homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

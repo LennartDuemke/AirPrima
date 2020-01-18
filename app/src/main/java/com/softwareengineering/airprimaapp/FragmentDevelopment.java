@@ -531,21 +531,21 @@ public class FragmentDevelopment extends Fragment {
     /**
      * Returns the year from a timestring (YYYY-MM-DD HH:MM:SS)
      */
-    private String getYearFromTimestring(String timestring) {
+    public String getYearFromTimestring(String timestring) {
         return timestring.substring(0, 4);
     }
 
     /**
      * Returns the month from a timestring (YYYY-MM-DD HH:MM:SS)
      */
-    private String getMonthFromTimestring(String timestring) {
+    public String getMonthFromTimestring(String timestring) {
         return timestring.substring(5, 7);
     }
 
     /**
      * Returns the day from a timestring (YYYY-MM-DD HH:MM:SS)
      */
-    private String getDayFromTimestring(String timestring) {
+    public String getDayFromTimestring(String timestring) {
         return timestring.substring(8, 10);
     }
 

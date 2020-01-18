@@ -27,12 +27,15 @@
 
         <activity
             android:name=".InformationActivity"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ProductInformationActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ParticulateMatterInfoActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".StationaryActivity"
@@ -54,21 +57,11 @@
 
         <activity
             android:name=".EditLocationActivity"
-            android:parentActivityName=".LocationsActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".LocationsActivity" />
-        </activity>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".VisualizationActivity"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ConnectActivity"

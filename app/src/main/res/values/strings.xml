@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">AirPrima</string>
 
+    <string name="notification_channel_name">CHANNEL_AP_YDLD</string>
+    <string name="notification_channel_description">Notification channel for AirPrima</string>
+
     <string name="save">Speichern</string>
     <string name="cancel">Abbrechen</string>
     <string name="select">Auswählen</string>
@@ -60,6 +63,12 @@
 
     <string name="information_product">Produkt Infos</string>
     <string name="information_finedust">Feinstaub Infos</string>
+    <string name="product_info_title">Produktinformationen</string>
+    <string name="product_info_content">Die AirPrima Sensorstation ermöglicht es, die beiden Feinstaubpartikelgrößen PM10 und PM2.5, die Temperatur und die Luftfeuchtigkeit zu messen. Sie können die Sensorstation sowohl im Inneren Ihres Hauses wie auch draußen im Freien verwenden. Mithilfe einer Powerbank kann die gesamte Station tragbar gemacht werden, um auch im Straßenverkehr die Feinstaubbelastung zu messen. Per Bluetooth werden die Messwerte zwischen der Sensorstation und dieser App übertragen. Die App visualisiert die empfangenen Messwerte, sowie deren Entwicklung über verschiedene Zeiträume. Werden Feinstaubgrenzwerte überschritten, werden sie darüber benachrichtigt. Sie können zwischen Stationärem- und Mobilem-Messen wählen. Mit Stationärem-Messen kann die Entwicklung der Werte an einem Standort über einen längeren Zeitraum verfolgt werden. Bei Mobilem-Messen werden keine Daten gespeichert.</string>
+    <string name="finedust_info_title1">Feinstaub</string>
+    <string name="finedust_info_content1">Feinstaub bezeichnet Verunreinigungen in der Luft (z.B. Abgase, Pollen, Ruß, etc.) und setzt sich aus vielen unterschiedlichen Bestandteilen zusammen. Von Interesse sind dabei besonders die Feinstaubpartikel der Größe PM10 und PM2.5 (Größe in μm), die als gesundheitsgefährdend eingestuft werden, da diese nicht von der Nase abgefangen werden und in die Bronchien und Lungenbläschen eindringen können.</string>
+    <string name="finedust_info_title2">Grenzwerte</string>
+    <string name="finedust_info_content2">Die WHO empfielt folgende Grenzwerte:\n\n PM10:\n 	- Jahresmittel = 20 µg/m³\n 	- Tagesmittel = 50 µg/m³ \n\n PM2.5: \n 	- Jahresmittel = 10 µg/m³\n 	- Tagesmittel = 25 µg/m³\n</string>
 
     <string name="stationary_connect">Mit Sensor verbinden</string>
     <string name="stationary_old_data">Daten einsehen</string>
@@ -140,5 +149,8 @@
     <string name="min_max_time_period_button">Zeitraum auswählen</string>
     <string name="min_max_finedust_values">PM2.5: %1$d µg/m³\nPM10: %2$d µg/m³</string>
     <string name="dialog_time_period_title">Wählen Sie einen Zeitraum aus:</string>
+
+    <string name="finedust_notification_title">Kritischer Feinstaubwert</string>
+    <string name="finedust_notification_content">Der PM%1$s Wert beträgt %2$s µg/m³</string>
 
 </resources>

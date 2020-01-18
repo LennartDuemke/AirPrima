@@ -1,6 +1,8 @@
 package com.softwareengineering.airprimaapp;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +27,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +70,10 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
     private boolean started;        // Did the discovery of bluetooth devices already start?
     private Thread clientThread;
     private Context context;
+
+    // Notification
+    private static final String CHANNEL_ID = "AIRPRIMA_YDLD";
+    private static final int notificationId = 1066;
 
     /**
      * Listens for available bluetooth devices near the user
@@ -114,6 +123,9 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
         setContentView(R.layout.activity_connect);
 
         context = this;
+
+        // Notification
+        createNotificationChannel();
 
         bluetoothStatusView = findViewById(R.id.bt_connect_status);
         ListView pairedDevicesListView = findViewById(R.id.bt_connect_paired_list);
@@ -200,10 +212,6 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
             bluetoothAdapter.cancelDiscovery();
             started = false;
         }
-        /*if (clientThread != null) {               // TODO In OnDestroy???????
-            clientThread.interrupt();
-            clientThread = null;
-        }*/
     }
 
     /**
@@ -481,6 +489,17 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                                                 Float.parseFloat(measurements[counter + 4]),
                                                 Long.parseLong(measurements[counter + 5])
                                         );
+
+                                        // Check the finedust measurements and notify user when they are too high
+                                        float pm2_5 = Float.parseFloat(measurements[counter + 1]);
+                                        float pm10 = Float.parseFloat(measurements[counter + 2]);
+                                        if (pm10 > 50.0) {
+                                            notifyUser("10", pm10);
+                                        }
+                                        if (pm2_5 > 25.0) {
+                                            notifyUser("2.5", pm2_5);
+                                        }
+
                                         counter += 6;
                                     }
                                     Log.d(TAG, "LOOP - " + counter / 6 + " Measurements received!");
@@ -512,7 +531,7 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
     /**
      * Converts an Unix timestamp to a SQlite timestring
      */
-    private String unixTimestampToSQLiteTimestring(String timestamp) {
+    public String unixTimestampToSQLiteTimestring(String timestamp) {
         long tmpTimestamp = Long.parseLong(timestamp);
         Date date = new Date(tmpTimestamp * 1000); // Needs milliseconds and not seconds
         Calendar calendar = Calendar.getInstance();
@@ -581,6 +600,34 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
         }
         Log.d(TAG, "RECEIVE - NULL!");
         return null;
+    }
+
+    /**
+     * Register notification channel
+     */
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.notification_channel_name);
+            String description = getString(R.string.notification_channel_description);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    /**
+     * Notifies the user when the finedust measurements are too high
+     */
+    public void notifyUser(String pm, float value) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(getString(R.string.finedust_notification_title))
+                .setContentText(getString(R.string.finedust_notification_content, pm, String.valueOf(value)))
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(notificationId, builder.build());
     }
 
     /**
