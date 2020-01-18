@@ -25,6 +25,15 @@ public class ParticulateMatterInfoActivity extends AppCompatActivity {
     }
 
     /**
+     * Change the options menu (Disable item)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        menu.findItem(R.id.item_info).setVisible(false);
+        return true;
+    }
+
+    /**
      * Create the options menu
      */
     @Override

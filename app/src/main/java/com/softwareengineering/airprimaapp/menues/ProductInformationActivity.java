@@ -35,6 +35,15 @@ public class ProductInformationActivity extends AppCompatActivity {
     }
 
     /**
+     * Change the options menu (Disable item)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        menu.findItem(R.id.item_info).setVisible(false);
+        return true;
+    }
+
+    /**
      * Handling click events of menu
      */
     @Override

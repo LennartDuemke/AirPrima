@@ -65,6 +65,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Change the options menu (Disable item)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        menu.findItem(R.id.item_home).setVisible(false);
+        return true;
+    }
+
+    /**
      * Handling click events of menu
      */
     @Override
