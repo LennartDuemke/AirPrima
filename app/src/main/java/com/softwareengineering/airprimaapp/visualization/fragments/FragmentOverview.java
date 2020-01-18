@@ -1,12 +1,14 @@
-package com.softwareengineering.airprimaapp.visualization;
+package com.softwareengineering.airprimaapp.visualization.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -14,10 +16,19 @@ import androidx.fragment.app.Fragment;
 import com.softwareengineering.airprimaapp.R;
 import com.softwareengineering.airprimaapp.other.DatabaseHandler;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Fragment in VisualizationActivity: Overview over all the four sensor readings.
  */
 public class FragmentOverview extends Fragment {
+
+    private static final String TAG = FragmentOverview.class.getSimpleName();
 
     private static final String MEASUREMENT_PM_2_5 = "measurement_pm_2_5";
     private static final String MEASUREMENT_PM_10 = "measurement_pm_10";
@@ -36,12 +47,16 @@ public class FragmentOverview extends Fragment {
     private DatabaseHandler dbHandler;
     private long locationID;
 
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> updaterHandle = null;
+
     /**
      * Method to initialize fragment
      */
-    static FragmentOverview newInstance(long locationID) {
+    public static FragmentOverview newInstance(long locationID, boolean isConnected) {
         Bundle bundle = new Bundle();
         bundle.putLong("id", locationID);
+        bundle.putBoolean("connected", isConnected);
 
         FragmentOverview fragment = new FragmentOverview();
         fragment.setArguments(bundle);
@@ -81,8 +96,12 @@ public class FragmentOverview extends Fragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             locationID = arguments.getLong("id");
+            boolean isConnected = arguments.getBoolean("connected");
 
             insertData();
+            if(isConnected) {
+                startScheduledExecutorService();
+            }
         }
     }
 
@@ -93,6 +112,10 @@ public class FragmentOverview extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         dbHandler.close();
+        if(updaterHandle != null) {
+            updaterHandle.cancel(true);
+        }
+        scheduler.shutdown();
     }
 
     /**
@@ -106,21 +129,29 @@ public class FragmentOverview extends Fragment {
 
                 newestM.moveToFirst();
 
-                int pm2_5 = (int) newestM.getDouble(newestM.getColumnIndex(MEASUREMENT_PM_2_5));
-                int pm10 = (int) newestM.getDouble(newestM.getColumnIndex(MEASUREMENT_PM_10));
-                int temp = (int) newestM.getDouble(newestM.getColumnIndex(MEASUREMENT_TEMP));
-                int humid = (int) newestM.getDouble(newestM.getColumnIndex(MEASUREMENT_HUM));
+                float pm2_5 = newestM.getFloat(newestM.getColumnIndex(MEASUREMENT_PM_2_5));
+                float pm10 = newestM.getFloat(newestM.getColumnIndex(MEASUREMENT_PM_10));
+                float temp = newestM.getFloat(newestM.getColumnIndex(MEASUREMENT_TEMP));
+                float humid = newestM.getFloat(newestM.getColumnIndex(MEASUREMENT_HUM));
 
                 String year = newestM.getString(newestM.getColumnIndex("year"));
                 String month = newestM.getString(newestM.getColumnIndex("month"));
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
-                viewPM2_5.setText(getString(R.string.overview_pm2_5, pm2_5));
-                viewPM10.setText(getString(R.string.overview_pm10, pm10));
-                viewTemp.setText(getString(R.string.overview_temp, temp));
-                viewHumid.setText(getString(R.string.overview_humid, humid));
+                viewTitle.setVisibility(View.VISIBLE);
+                upperPart.setVisibility(View.VISIBLE);
+                lowerPart.setVisibility(View.VISIBLE);
+                viewNoData.setVisibility(View.GONE);
+
                 viewTitle.setText(getString(R.string.overview_title, date));
+
+                DecimalFormat df = new DecimalFormat("#.#");
+                df.setRoundingMode(RoundingMode.HALF_UP);
+                viewPM2_5.setText(getString(R.string.overview_pm2_5, df.format(pm2_5)));
+                viewPM10.setText(getString(R.string.overview_pm10, df.format(pm10)));
+                viewTemp.setText(getString(R.string.overview_temp, df.format(temp)));
+                viewHumid.setText(getString(R.string.overview_humid, df.format(humid)));
 
             } else {
                 viewTitle.setVisibility(View.GONE);
@@ -130,5 +161,30 @@ public class FragmentOverview extends Fragment {
             }
             newestM.close();
         }
+    }
+
+    /**
+     * Starts a scheduledExecutorService that updates the measurements
+     */
+    private void startScheduledExecutorService() {
+
+        final Runnable updater = new Runnable() {
+            public void run() {
+                try {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "Starting task of ScheduledExecutorService");
+                            insertData();
+                            Log.d(TAG, "Finished task of ScheduledExecutorService");
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "ERROR in ScheduledExecutorService", e);
+                }
+            }
+        };
+
+        updaterHandle = scheduler.scheduleAtFixedRate(updater, 5, 5, TimeUnit.SECONDS);
     }
 }

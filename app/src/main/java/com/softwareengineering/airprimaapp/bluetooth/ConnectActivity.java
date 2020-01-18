@@ -385,7 +385,7 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                             if(initStr.equals("Ja, bin ich.")) {
                                 Log.d(TAG, "INIT - Confirmation received!");
 
-                                int locationMeasuringFreq = 2;  // Default for mobile measurement
+                                int locationMeasuringFreq = 1;  // Server overrides this value! Uses 20 seconds for mobile measurement
                                 long timestamp = 1454000043;    // Some old timestamp ...
 
                                 // Get measuring frequency and latest timestamp for stationary measurement
@@ -432,6 +432,14 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                                         Intent intentVisualize = new Intent();
                                         intentVisualize.setClass(context, VisualizationActivity.class);
                                         intentVisualize.putExtra("id", locationID);
+
+                                        if(locationID != MOBILE_MEASUREMENT_ID) {
+                                            intentVisualize.putExtra("mobile", false);
+                                            intentVisualize.putExtra("connected", true);
+                                        } else {
+                                            intentVisualize.putExtra("mobile", true);
+                                            intentVisualize.putExtra("connected", true);
+                                        }
                                         startActivity(intentVisualize);
 
                                     } else {
@@ -453,6 +461,8 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
 
                         // Main logic after initialization
                         while (keepRunning && THREAD_RUN) {
+
+                            Log.d(TAG, "LOOP - THREAD_RUN = " + String.valueOf(THREAD_RUN));
 
                             // Receive data in main loop
                             String data = receive(inputStream, 1000);
@@ -486,24 +496,31 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                                     String[] measurements = data.split(";");
                                     int counter = 1;
                                     for(int i = 0; i < (measurements.length - 1) / 6; i++) {
-                                        dbHandler.insertMeasurement(
-                                                Long.parseLong(measurements[counter]),
-                                                unixTimestampToSQLiteTimestring(measurements[counter]),
-                                                Float.parseFloat(measurements[counter + 1]),
-                                                Float.parseFloat(measurements[counter + 2]),
-                                                Float.parseFloat(measurements[counter + 3]),
-                                                Float.parseFloat(measurements[counter + 4]),
-                                                Long.parseLong(measurements[counter + 5])
-                                        );
 
-                                        // Check the finedust measurements and notify user when they are too high
-                                        float pm2_5 = Float.parseFloat(measurements[counter + 1]);
-                                        float pm10 = Float.parseFloat(measurements[counter + 2]);
-                                        if (pm10 > 50.0) {
-                                            notifyUser("10", pm10);
-                                        }
-                                        if (pm2_5 > 25.0) {
-                                            notifyUser("2.5", pm2_5);
+                                        String strTemp = measurements[counter + 3];
+                                        String strHumid = measurements[counter + 4];
+
+                                        if(!strTemp.equals("None") && !strHumid.equals("None")) {
+
+                                            dbHandler.insertMeasurement(
+                                                    Long.parseLong(measurements[counter]),
+                                                    unixTimestampToSQLiteTimestring(measurements[counter]),
+                                                    Float.parseFloat(measurements[counter + 1]),
+                                                    Float.parseFloat(measurements[counter + 2]),
+                                                    Float.parseFloat(measurements[counter + 3]),
+                                                    Float.parseFloat(measurements[counter + 4]),
+                                                    Long.parseLong(measurements[counter + 5])
+                                            );
+
+                                            // Check the finedust measurements and notify user when they are too high
+                                            float pm2_5 = Float.parseFloat(measurements[counter + 1]);
+                                            float pm10 = Float.parseFloat(measurements[counter + 2]);
+                                            if (pm10 > 50.0) {
+                                                notifyUser("10", pm10);
+                                            }
+                                            if (pm2_5 > 25.0) {
+                                                notifyUser("2.5", pm2_5);
+                                            }
                                         }
 
                                         counter += 6;

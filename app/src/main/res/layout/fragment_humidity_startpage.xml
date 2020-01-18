@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_humidity_startpage"
     android:orientation="vertical"
-    tools:context=".visualization.FragmentHumidityStartpage">
+    tools:context=".visualization.fragments.FragmentHumidityStartpage">
 
     <TextView
         android:id="@+id/humidity_startpage_title"

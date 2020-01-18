@@ -1,4 +1,4 @@
-package com.softwareengineering.airprimaapp.visualization;
+package com.softwareengineering.airprimaapp.visualization.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,6 +23,9 @@ import com.anychart.enums.LegendLayout;
 import com.anychart.enums.SelectionMode;
 import com.softwareengineering.airprimaapp.R;
 import com.softwareengineering.airprimaapp.other.DatabaseHandler;
+import com.softwareengineering.airprimaapp.visualization.Date;
+import com.softwareengineering.airprimaapp.visualization.DatepickerDialog;
+import com.softwareengineering.airprimaapp.visualization.DatepickerListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,16 +55,18 @@ public class FragmentPieChart extends Fragment {
     private List<DataEntry> chartData = new ArrayList<>();
 
     private long locationID;
+    private boolean isConnected;
     private boolean showPm10;
     private boolean init = true;
 
     /**
      * Method to initialize fragment
      */
-    static FragmentPieChart newInstance(long locationID, boolean pm10) {
+    public static FragmentPieChart newInstance(long locationID, boolean pm10, boolean isConnected) {
         Bundle bundle = new Bundle();
         bundle.putLong("id", locationID);
         bundle.putBoolean("pm10", pm10);
+        bundle.putBoolean("connected", isConnected);
 
         FragmentPieChart fragment = new FragmentPieChart();
         fragment.setArguments(bundle);
@@ -101,6 +106,7 @@ public class FragmentPieChart extends Fragment {
         if (arguments != null) {
             locationID = arguments.getLong("id");
             showPm10 = arguments.getBoolean("pm10");
+            isConnected = arguments.getBoolean("connected");
             insertData();
         }
     }

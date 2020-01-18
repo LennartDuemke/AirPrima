@@ -81,6 +81,8 @@ public class LocationsActivity extends AppCompatActivity {
                             Intent intentVisualize = new Intent();
                             intentVisualize.setClass(view.getContext(), VisualizationActivity.class);
                             intentVisualize.putExtra("id", id);
+                            intentVisualize.putExtra("mobile", false);
+                            intentVisualize.putExtra("connected", false);
                             startActivity(intentVisualize);
                             break;
                     }

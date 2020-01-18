@@ -1,4 +1,4 @@
-package com.softwareengineering.airprimaapp.visualization;
+package com.softwareengineering.airprimaapp.visualization.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -25,6 +25,10 @@ import com.anychart.enums.SelectionMode;
 import com.anychart.scales.DateTime;
 import com.softwareengineering.airprimaapp.R;
 import com.softwareengineering.airprimaapp.other.DatabaseHandler;
+import com.softwareengineering.airprimaapp.visualization.Date;
+import com.softwareengineering.airprimaapp.visualization.DatepickerDialog;
+import com.softwareengineering.airprimaapp.visualization.DatepickerListener;
+import com.softwareengineering.airprimaapp.visualization.Sensor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +62,7 @@ public class FragmentDevelopment extends Fragment {
     private Set set;
 
     private long locationID;
+    private boolean isConnected;
     private Sensor sensorType;
     private Date dateType;
 
@@ -67,11 +72,12 @@ public class FragmentDevelopment extends Fragment {
     /**
      * Method to initialize fragment
      */
-    static FragmentDevelopment newInstance(long locationID, Sensor sensorType, Date dateType) {
+    public static FragmentDevelopment newInstance(long locationID, Sensor sensorType, Date dateType, boolean isConnected) {
         Bundle bundle = new Bundle();
         bundle.putLong("id", locationID);
         bundle.putSerializable("sensor", sensorType);
         bundle.putSerializable("date", dateType);
+        bundle.putBoolean("connected", isConnected);
 
         FragmentDevelopment fragment = new FragmentDevelopment();
         fragment.setArguments(bundle);
@@ -125,6 +131,7 @@ public class FragmentDevelopment extends Fragment {
             locationID = arguments.getLong("id");
             sensorType = (Sensor) arguments.getSerializable("sensor");
             dateType = (Date) arguments.getSerializable("date");
+            isConnected = arguments.getBoolean("connected");
 
             insertData();
         }

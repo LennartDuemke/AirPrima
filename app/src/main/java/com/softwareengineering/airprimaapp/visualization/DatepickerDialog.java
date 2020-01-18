@@ -47,7 +47,7 @@ public class DatepickerDialog extends Dialog {
     /**
      * Constructor
      */
-    DatepickerDialog(Activity activity, Date dateEnum, long locationID) {
+    public DatepickerDialog(Activity activity, Date dateEnum, long locationID) {
         super(activity);
         this.activity = activity;
         this.dateEnum = dateEnum;
@@ -106,7 +106,7 @@ public class DatepickerDialog extends Dialog {
     /**
      * Setter for the listener
      */
-    void setListener(DatepickerListener listener) {
+    public void setListener(DatepickerListener listener) {
         this.listener = listener;
     }
 

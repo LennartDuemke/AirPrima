@@ -26,7 +26,7 @@ import com.softwareengineering.airprimaapp.other.DatabaseHandler;
 public class EditLocationActivity extends AppCompatActivity {
 
     private static final String TAG = EditLocationActivity.class.getSimpleName();   // Tag for the logger
-    private final int minFreq = 2;
+    private final int minFreq = 1;
     private final int maxFreq = 60;
     private DatabaseHandler dbHandler;
     private Bundle bundle;

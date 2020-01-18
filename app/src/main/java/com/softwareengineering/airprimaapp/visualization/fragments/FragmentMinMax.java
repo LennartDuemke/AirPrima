@@ -1,4 +1,4 @@
-package com.softwareengineering.airprimaapp.visualization;
+package com.softwareengineering.airprimaapp.visualization.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -13,7 +13,15 @@ import androidx.fragment.app.Fragment;
 
 import com.softwareengineering.airprimaapp.R;
 import com.softwareengineering.airprimaapp.other.DatabaseHandler;
+import com.softwareengineering.airprimaapp.visualization.Date;
+import com.softwareengineering.airprimaapp.visualization.DatepickerDialog;
+import com.softwareengineering.airprimaapp.visualization.DatepickerListener;
+import com.softwareengineering.airprimaapp.visualization.Sensor;
+import com.softwareengineering.airprimaapp.visualization.TimePeriodPickerDialog;
+import com.softwareengineering.airprimaapp.visualization.TimePeriodPickerListener;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +39,13 @@ public class FragmentMinMax extends Fragment {
     private TextView noDataText;
 
     private DatabaseHandler dbHandler;
-    private double minValue;
-    private double minValue2;
-    private double maxValue;
-    private double maxValue2;
+    private float minValue;
+    private float minValue2;
+    private float maxValue;
+    private float maxValue2;
 
     private long locationID;
+    private boolean isConnected;
     private Sensor sensorType;
     private Date dateType;
 
@@ -45,10 +54,11 @@ public class FragmentMinMax extends Fragment {
     /**
      * Method to initialize fragment
      */
-    static FragmentMinMax newInstance(long locationID, Sensor sensorType) {
+    public static FragmentMinMax newInstance(long locationID, Sensor sensorType, boolean isConnected) {
         Bundle bundle = new Bundle();
         bundle.putLong("id", locationID);
         bundle.putSerializable("sensor", sensorType);
+        bundle.putBoolean("connected", isConnected);
 
         FragmentMinMax fragment = new FragmentMinMax();
         fragment.setArguments(bundle);
@@ -102,6 +112,7 @@ public class FragmentMinMax extends Fragment {
         if (arguments != null) {
             locationID = arguments.getLong("id");
             sensorType = (Sensor) arguments.getSerializable("sensor");
+            isConnected = arguments.getBoolean("connected");
 
             insertData();
         }
@@ -254,18 +265,18 @@ public class FragmentMinMax extends Fragment {
 
                 switch (sensorType) {
                     case FINEDUST:
-                        minValue = cursor.getDouble(cursor.getColumnIndex("min2_5"));
-                        maxValue = cursor.getDouble(cursor.getColumnIndex("max2_5"));
-                        minValue2 = cursor.getDouble(cursor.getColumnIndex("min10"));
-                        maxValue2 = cursor.getDouble(cursor.getColumnIndex("max10"));
+                        minValue = cursor.getFloat(cursor.getColumnIndex("min2_5"));
+                        maxValue = cursor.getFloat(cursor.getColumnIndex("max2_5"));
+                        minValue2 = cursor.getFloat(cursor.getColumnIndex("min10"));
+                        maxValue2 = cursor.getFloat(cursor.getColumnIndex("max10"));
                         break;
                     case TEMPERATURE:
-                        minValue = cursor.getDouble(cursor.getColumnIndex("minTemp"));
-                        maxValue = cursor.getDouble(cursor.getColumnIndex("maxTemp"));
+                        minValue = cursor.getFloat(cursor.getColumnIndex("minTemp"));
+                        maxValue = cursor.getFloat(cursor.getColumnIndex("maxTemp"));
                         break;
                     case HUMIDITY:
-                        minValue = cursor.getDouble(cursor.getColumnIndex("minHum"));
-                        maxValue = cursor.getDouble(cursor.getColumnIndex("maxHum"));
+                        minValue = cursor.getFloat(cursor.getColumnIndex("minHum"));
+                        maxValue = cursor.getFloat(cursor.getColumnIndex("maxHum"));
                         break;
                 }
 
@@ -328,18 +339,20 @@ public class FragmentMinMax extends Fragment {
      * Inserts the min max values into the views
      */
     private void insertMinMaxValues() {
+        DecimalFormat df = new DecimalFormat("#.#");
+        df.setRoundingMode(RoundingMode.HALF_UP);
         switch (sensorType) {
             case FINEDUST:
-                upperValue.setText(getString(R.string.min_max_finedust_values, (int)minValue, (int)minValue2));
-                lowerValue.setText(getString(R.string.min_max_finedust_values, (int)maxValue, (int)maxValue2));
+                upperValue.setText(getString(R.string.min_max_finedust_values, df.format(minValue), df.format(minValue2)));
+                lowerValue.setText(getString(R.string.min_max_finedust_values, df.format(maxValue), df.format(maxValue2)));
                 break;
             case TEMPERATURE:
-                upperValue.setText(getString(R.string.temperature_value_celsius, (int)minValue));
-                lowerValue.setText(getString(R.string.temperature_value_celsius, (int)maxValue));
+                upperValue.setText(getString(R.string.temperature_value_celsius, df.format(minValue)));
+                lowerValue.setText(getString(R.string.temperature_value_celsius, df.format(maxValue)));
                 break;
             case HUMIDITY:
-                upperValue.setText(getString(R.string.humidity_value, (int)minValue));
-                lowerValue.setText(getString(R.string.humidity_value, (int)maxValue));
+                upperValue.setText(getString(R.string.humidity_value, df.format(minValue)));
+                lowerValue.setText(getString(R.string.humidity_value, df.format(maxValue)));
                 break;
         }
     }

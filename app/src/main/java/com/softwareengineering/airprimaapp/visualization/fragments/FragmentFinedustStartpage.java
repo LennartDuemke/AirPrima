@@ -1,7 +1,8 @@
-package com.softwareengineering.airprimaapp.visualization;
+package com.softwareengineering.airprimaapp.visualization.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,19 @@ import androidx.fragment.app.Fragment;
 import com.softwareengineering.airprimaapp.R;
 import com.softwareengineering.airprimaapp.other.DatabaseHandler;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Fragment in VisualizationActivity: First page when the user presses the particulate matter button.
  */
 public class FragmentFinedustStartpage extends Fragment {
 
+    private static final String TAG = FragmentFinedustStartpage.class.getSimpleName();
     private static final String MEASUREMENT_PM_2_5 = "measurement_pm_2_5";
     private static final String MEASUREMENT_PM_10 = "measurement_pm_10";
 
@@ -29,12 +38,16 @@ public class FragmentFinedustStartpage extends Fragment {
     private DatabaseHandler dbHandler;
     private long locationID;
 
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> updaterHandle = null;
+
     /**
      * Method to initialize fragment
      */
-    static FragmentFinedustStartpage newInstance(long locationID) {
+    public static FragmentFinedustStartpage newInstance(long locationID, boolean isConnected) {
         Bundle bundle = new Bundle();
         bundle.putLong("id", locationID);
+        bundle.putBoolean("connected", isConnected);
 
         FragmentFinedustStartpage fragment = new FragmentFinedustStartpage();
         fragment.setArguments(bundle);
@@ -69,8 +82,12 @@ public class FragmentFinedustStartpage extends Fragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             locationID = arguments.getLong("id");
+            boolean isConnected = arguments.getBoolean("connected");
 
             insertData();
+            if(isConnected) {
+                startScheduledExecutorService();
+            }
         }
     }
 
@@ -81,6 +98,10 @@ public class FragmentFinedustStartpage extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         dbHandler.close();
+        if(updaterHandle != null) {
+            updaterHandle.cancel(true);
+        }
+        scheduler.shutdown();
     }
 
     /**
@@ -94,17 +115,25 @@ public class FragmentFinedustStartpage extends Fragment {
 
                 newestM.moveToFirst();
 
-                double value2_5 = newestM.getDouble(newestM.getColumnIndex(MEASUREMENT_PM_2_5));
-                double value10 = newestM.getDouble(newestM.getColumnIndex(MEASUREMENT_PM_10));
+                float value2_5 = newestM.getFloat(newestM.getColumnIndex(MEASUREMENT_PM_2_5));
+                float value10 = newestM.getFloat(newestM.getColumnIndex(MEASUREMENT_PM_10));
 
                 String year = newestM.getString(newestM.getColumnIndex("year"));
                 String month = newestM.getString(newestM.getColumnIndex("month"));
                 String day = newestM.getString(newestM.getColumnIndex("day"));
                 String date = day + "." + month + "." + year;
 
+                viewTitle.setVisibility(View.VISIBLE);
+                viewPM2_5.setVisibility(View.VISIBLE);
+                viewPM10.setVisibility(View.VISIBLE);
+                viewNoData.setVisibility(View.GONE);
+
                 viewTitle.setText(getString(R.string.finedust_startpage_title, date));
-                viewPM2_5.setText(getString(R.string.finedust_startpage_2_5, (int)value2_5));
-                viewPM10.setText(getString(R.string.finedust_startpage_10, (int)value10));
+
+                DecimalFormat df = new DecimalFormat("#.#");
+                df.setRoundingMode(RoundingMode.HALF_UP);
+                viewPM2_5.setText(getString(R.string.finedust_startpage_2_5, df.format(value2_5)));
+                viewPM10.setText(getString(R.string.finedust_startpage_10, df.format(value10)));
 
             } else {
                 viewTitle.setVisibility(View.GONE);
@@ -114,6 +143,31 @@ public class FragmentFinedustStartpage extends Fragment {
             }
             newestM.close();
         }
+    }
+
+    /**
+     * Starts a scheduledExecutorService that updates the measurements
+     */
+    private void startScheduledExecutorService() {
+
+        final Runnable updater = new Runnable() {
+            public void run() {
+                try {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "Starting task of ScheduledExecutorService");
+                            insertData();
+                            Log.d(TAG, "Finished task of ScheduledExecutorService");
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "ERROR in ScheduledExecutorService", e);
+                }
+            }
+        };
+
+        updaterHandle = scheduler.scheduleAtFixedRate(updater, 5, 5, TimeUnit.SECONDS);
     }
 }
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_overview"
     android:orientation="vertical"
-    tools:context=".visualization.FragmentOverview">
+    tools:context=".visualization.fragments.FragmentOverview">
 
     <TextView
         android:id="@+id/overview_title"

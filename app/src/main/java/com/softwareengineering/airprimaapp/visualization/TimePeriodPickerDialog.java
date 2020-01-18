@@ -20,14 +20,14 @@ public class TimePeriodPickerDialog extends Dialog {
     /**
      * Constructor
      */
-    TimePeriodPickerDialog(Activity activity) {
+    public TimePeriodPickerDialog(Activity activity) {
         super(activity);
     }
 
     /**
      * Setter for the listener
      */
-    void setListener(TimePeriodPickerListener listener) {
+    public void setListener(TimePeriodPickerListener listener) {
         this.listener = listener;
     }
 

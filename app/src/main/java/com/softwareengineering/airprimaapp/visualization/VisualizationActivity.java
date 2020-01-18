@@ -17,6 +17,13 @@ import com.softwareengineering.airprimaapp.menues.MainActivity;
 import com.softwareengineering.airprimaapp.R;
 import com.softwareengineering.airprimaapp.bluetooth.ConnectActivity;
 import com.softwareengineering.airprimaapp.other.DatabaseHandler;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterFinedust;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterFinedustMobile;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterHumidity;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterHumidityMobile;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterOverview;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterTemperature;
+import com.softwareengineering.airprimaapp.visualization.pageradapter.ViewPagerAdapterTemperatureMobile;
 
 /**
  * Activity that visualizes the sensor station readings.
@@ -28,6 +35,10 @@ public class VisualizationActivity extends AppCompatActivity {
     private ViewPagerAdapterTemperature viewPagerAdapterTemperature;
     private ViewPagerAdapterHumidity viewPagerAdapterHumidity;
 
+    private ViewPagerAdapterFinedustMobile viewPagerAdapterFinedustMobile;
+    private ViewPagerAdapterTemperatureMobile viewPagerAdapterTemperatureMobile;
+    private ViewPagerAdapterHumidityMobile viewPagerAdapterHumidityMobile;
+
     private ViewPager viewPager;
 
     private ImageButton button_overview;
@@ -37,6 +48,8 @@ public class VisualizationActivity extends AppCompatActivity {
 
     private DatabaseHandler dbHandler;
     private long locationID;
+    private boolean isMobile;
+    private boolean isConnected;
 
     /**
      * Setup for the activity
@@ -55,6 +68,8 @@ public class VisualizationActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         if(b != null) {
             locationID = b.getLong("id");
+            isMobile = b.getBoolean("mobile");
+            isConnected = b.getBoolean("connected");
         } else {
             finish();
         }
@@ -74,11 +89,11 @@ public class VisualizationActivity extends AppCompatActivity {
                 // Update ViewPager Adapter
                 viewPager.removeAllViews();
                 viewPager.setAdapter(null);
-                viewPagerAdapterOverview = new ViewPagerAdapterOverview(getSupportFragmentManager(), locationID);
+                viewPagerAdapterOverview = new ViewPagerAdapterOverview(getSupportFragmentManager(), locationID, isConnected);
                 viewPager.setAdapter(viewPagerAdapterOverview);
-
             }
         });
+
         button_finedust.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,10 +102,16 @@ public class VisualizationActivity extends AppCompatActivity {
                 // Update ViewPager Adapter
                 viewPager.removeAllViews();
                 viewPager.setAdapter(null);
-                viewPagerAdapterFinedust = new ViewPagerAdapterFinedust(getSupportFragmentManager(), locationID);
-                viewPager.setAdapter(viewPagerAdapterFinedust);
+                if(isMobile) {      // Mobile measurement:
+                    viewPagerAdapterFinedustMobile = new ViewPagerAdapterFinedustMobile(getSupportFragmentManager(), locationID);
+                    viewPager.setAdapter(viewPagerAdapterFinedustMobile);
+                } else {            // Stationary measurement:
+                    viewPagerAdapterFinedust = new ViewPagerAdapterFinedust(getSupportFragmentManager(), locationID, isConnected);
+                    viewPager.setAdapter(viewPagerAdapterFinedust);
+                }
             }
         });
+
         button_temperature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,10 +120,16 @@ public class VisualizationActivity extends AppCompatActivity {
                 // Update ViewPager Adapter
                 viewPager.removeAllViews();
                 viewPager.setAdapter(null);
-                viewPagerAdapterTemperature = new ViewPagerAdapterTemperature(getSupportFragmentManager(), locationID);
-                viewPager.setAdapter(viewPagerAdapterTemperature);
+                if(isMobile) {      // Mobile measurement:
+                    viewPagerAdapterTemperatureMobile = new ViewPagerAdapterTemperatureMobile(getSupportFragmentManager(), locationID);
+                    viewPager.setAdapter(viewPagerAdapterTemperatureMobile);
+                } else {            // Stationary measurement:
+                    viewPagerAdapterTemperature = new ViewPagerAdapterTemperature(getSupportFragmentManager(), locationID, isConnected);
+                    viewPager.setAdapter(viewPagerAdapterTemperature);
+                }
             }
         });
+
         button_humidity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,13 +138,18 @@ public class VisualizationActivity extends AppCompatActivity {
                 // Update ViewPager Adapter
                 viewPager.removeAllViews();
                 viewPager.setAdapter(null);
-                viewPagerAdapterHumidity = new ViewPagerAdapterHumidity(getSupportFragmentManager(), locationID);
-                viewPager.setAdapter(viewPagerAdapterHumidity);
+                if(isMobile) {      // Mobile measurement:
+                    viewPagerAdapterHumidityMobile = new ViewPagerAdapterHumidityMobile(getSupportFragmentManager(), locationID);
+                    viewPager.setAdapter(viewPagerAdapterHumidityMobile);
+                } else {            // Stationary measurement:
+                    viewPagerAdapterHumidity = new ViewPagerAdapterHumidity(getSupportFragmentManager(), locationID, isConnected);
+                    viewPager.setAdapter(viewPagerAdapterHumidity);
+                }
             }
         });
 
         // Viewpager adapter
-        viewPagerAdapterOverview = new ViewPagerAdapterOverview(getSupportFragmentManager(), locationID);
+        viewPagerAdapterOverview = new ViewPagerAdapterOverview(getSupportFragmentManager(), locationID, isConnected);
         viewPager = findViewById(R.id.pagerReadings);
         viewPager.setAdapter(viewPagerAdapterOverview);
     }

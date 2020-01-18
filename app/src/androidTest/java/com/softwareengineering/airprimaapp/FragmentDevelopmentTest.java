@@ -1,6 +1,6 @@
 package com.softwareengineering.airprimaapp;
 
-import com.softwareengineering.airprimaapp.visualization.FragmentDevelopment;
+import com.softwareengineering.airprimaapp.visualization.fragments.FragmentDevelopment;
 
 import org.junit.Before;
 import org.junit.Test;
