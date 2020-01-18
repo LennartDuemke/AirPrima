@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_temperature_startpage"
     android:orientation="vertical"
-    tools:context=".FragmentTemperatureStartpage">
+    tools:context=".visualization.FragmentTemperatureStartpage">
 
     <TextView
         android:id="@+id/temperature_startpage_title"

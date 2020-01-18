@@ -2,6 +2,8 @@ package com.softwareengineering.airprimaapp;
 
 import androidx.test.rule.ActivityTestRule;
 
+import com.softwareengineering.airprimaapp.bluetooth.ConnectActivity;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

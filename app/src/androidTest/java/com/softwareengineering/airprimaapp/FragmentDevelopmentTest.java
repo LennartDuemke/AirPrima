@@ -1,10 +1,8 @@
 package com.softwareengineering.airprimaapp;
 
-import androidx.fragment.app.FragmentActivity;
-import androidx.test.rule.ActivityTestRule;
+import com.softwareengineering.airprimaapp.visualization.FragmentDevelopment;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

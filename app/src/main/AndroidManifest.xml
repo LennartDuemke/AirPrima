@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".menues.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,45 +26,45 @@
         </activity>
 
         <activity
-            android:name=".InformationActivity"
+            android:name=".menues.InformationActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ProductInformationActivity"
+            android:name=".menues.ProductInformationActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ParticulateMatterInfoActivity"
+            android:name=".menues.ParticulateMatterInfoActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".StationaryActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".menues.StationaryActivity"
+            android:parentActivityName=".menues.MainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".menues.MainActivity" />
         </activity>
 
         <activity
-            android:name=".LocationsActivity"
-            android:parentActivityName=".StationaryActivity"
+            android:name=".menues.LocationsActivity"
+            android:parentActivityName=".menues.StationaryActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".StationaryActivity" />
+                android:value=".menues.StationaryActivity" />
         </activity>
 
         <activity
-            android:name=".EditLocationActivity"
+            android:name=".menues.EditLocationActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".VisualizationActivity"
+            android:name=".visualization.VisualizationActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ConnectActivity"
+            android:name=".bluetooth.ConnectActivity"
             android:screenOrientation="portrait" />
 
     </application>
