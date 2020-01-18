@@ -123,6 +123,7 @@ public class VisualizationActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         dbHandler.close();
+        ConnectActivity.THREAD_RUN = false;
     }
 
     /**

@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,11 +43,14 @@ import java.util.UUID;
  */
 public class ConnectActivity extends AppCompatActivity implements ConnectInterface {
 
+    public volatile static boolean THREAD_RUN = false;
+    public volatile static long MOBILE_MEASUREMENT_ID = 5000;
+    private long locationID;
+
     private static final String TAG = ConnectActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 123;
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 321;
     private static final UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
-    static final int MOBILE_MEASUREMENT_ID = 1000;
 
     private TextView bluetoothStatusView;
     private ProgressDialog progressDialog;
@@ -140,6 +144,13 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                 }
             }
         });
+
+        // Get the location id
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null) {
+            locationID = bundle.getLong("id");
+            Log.d(TAG, "==========> LocationID = " + locationID);
+        }
     }
 
     /**
@@ -189,10 +200,10 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
             bluetoothAdapter.cancelDiscovery();
             started = false;
         }
-        if (clientThread != null) {
+        /*if (clientThread != null) {               // TODO In OnDestroy???????
             clientThread.interrupt();
             clientThread = null;
-        }
+        }*/
     }
 
     /**
@@ -318,21 +329,24 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
      */
     private Thread createAndStartThread(final SocketThread t) {
         Thread workerThread = new Thread() {
+
             boolean keepRunning = true;
+            DatabaseHandler dbHandler;
 
             @Override
             public void run() {
                 try {
+                    THREAD_RUN = true;
+                    Log.d(TAG, "Starting " + t.getName());
                     t.start();
-                    Log.d(TAG, "Joining " + t.getName());
+                    Log.d(TAG, "JOIN - Waiting for " + t.getName() + " to die!");
                     t.join();
                     BluetoothSocket socket = t.getSocket();
 
-                    Intent intent = getIntent();
-                    String mode = intent.getStringExtra("mode");
-                    Log.d(TAG, String.format("MODE -------------------> %s", mode));
-
                     if (socket != null) {
+
+                        Log.d(TAG, "Got BluetoothSocket instance! (Socket != null)");
+                        dbHandler = new DatabaseHandler(context);
 
                         // Create OutputStream
                         OutputStream _os = null;
@@ -341,117 +355,153 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                         } catch (IOException e) {
                             Log.e(TAG, "OutputStream null", e);
                         }
-                        final OutputStream os = _os;
+                        final OutputStream outputStream = _os;
 
-                        InputStream is = socket.getInputStream();
+                        // Create InputStream
+                        InputStream inputStream = socket.getInputStream();
 
                         // Ask device if it is an AirPrima sensor station
-                        send(os, "Hallo. Bist du eine AirPrima Station ?");
+                        send(outputStream, "Hallo. Bist du eine AirPrima Station ?");
 
-                        // The sensor station has 3 seconds to answer
-                        sleep(3000);
+                        // Receive answer: Is it an AirPrima sensor station?
+                        String initStr = receive(inputStream, 1000);
+                        if (initStr != null) {
 
-                        progressDialog.dismiss();
+                            // Analyse received message
+                            if(initStr.equals("Ja, bin ich.")) {
+                                Log.d(TAG, "INIT - Confirmation received!");
 
-                        DatabaseHandler dbHandler;
-                        dbHandler = new DatabaseHandler(context);
+                                int locationMeasuringFreq = 2;  // Default for mobile measurement
+                                long timestamp = 1454000043;    // Some old timestamp ...
 
-                        // Analyse message
-                        String txt = receive(is);
-                        if (txt != null) {
+                                // Get measuring frequency and latest timestamp for stationary measurement
+                                if(locationID != MOBILE_MEASUREMENT_ID) {
 
-                            // It is an AirPrima sensor station
-                            if (txt.equals("Ja, bin ich.")) {
-                                Log.d(TAG, "Confirmation received.");
-
-
-                                int locationTransFreq = 3;
-
-                                if (mode.equals("mobile")) {
-                                    dbHandler.deleteAllMobileMeasurements();
-
-                                    ClientSocketThread.currentLocation = MOBILE_MEASUREMENT_ID;
-
-                                    Intent intentVisualize = new Intent();
-                                    intentVisualize.setClass(context, VisualizationActivity.class);
-                                    intentVisualize.putExtra("id", MOBILE_MEASUREMENT_ID);
-                                    startActivity(intentVisualize);
-                                } else if (mode.equals("stationary")) {
-                                    Intent viewIntent = new Intent(context, LocationsActivity.class);
-                                    startActivity(viewIntent);
-
-                                    // Wait till user has chosen a location
-                                    while (ClientSocketThread.currentLocation == -1) {
-                                        sleep(1000);
-                                        Log.d(TAG, "Waiting for user to choose location.");
+                                    // Get measuring frequency
+                                    Cursor cursor = dbHandler.querySpecificLocation(locationID);
+                                    if (cursor != null) {
+                                        if (cursor.getCount() > 0) {
+                                            cursor.moveToFirst();
+                                            locationMeasuringFreq = cursor.getInt(cursor.getColumnIndex("location_measuring_freq"));
+                                        }
+                                        cursor.close();
                                     }
 
-                                    Cursor cursor = dbHandler.querySpecificLocation(ClientSocketThread.currentLocation);
-                                    cursor.moveToFirst();
-                                    locationTransFreq = cursor.getInt(cursor.getColumnIndex("location_transmission_freq"));
-                                    cursor.close();
+                                    // Get latest timestamp
+                                    Cursor cursor2 = dbHandler.queryNewestTimestamp(locationID);
+                                    if (cursor2 != null) {
+                                        if(cursor2.getCount() > 0) {
+                                            cursor2.moveToFirst();
+                                            timestamp = cursor2.getInt(cursor2.getColumnIndex("measurement_timestamp"));
+                                        }
+                                        cursor2.close();
+                                    }
+
+                                } else {
+                                    dbHandler.deleteAllMobileMeasurements();
                                 }
 
+                                // Send initialization message
+                                Log.d(TAG, "INIT - Send initialization");
+                                send(outputStream, "INIT;" + locationID + ";" + locationMeasuringFreq + ";" + timestamp);
 
-                                send(os, "INIT;" + ClientSocketThread.currentLocation + ";" + locationTransFreq);
+                                // Receive answer: Initialization successful?
+                                String initFeedback = receive(inputStream, 1000);
+                                if (initFeedback != null) {
 
-                                sleep(3000);
+                                    if (initFeedback.equals("Initialisierung erfolgreich.")) {
+                                        Log.d(TAG, "INIT - Successful!");
 
-                                txt = receive(is);
+                                        progressDialog.dismiss();
 
-                                if (txt.equals("Initialisierung erfolgreich.")) {
-                                    Log.d(TAG, "Initialization successful.");
+                                        // Open the visualization activity
+                                        Intent intentVisualize = new Intent();
+                                        intentVisualize.setClass(context, VisualizationActivity.class);
+                                        intentVisualize.putExtra("id", locationID);
+                                        startActivity(intentVisualize);
+
+                                    } else {
+                                        keepRunning = false;
+                                        Log.e(TAG, "INIT - Failed on Server side!");
+                                    }
                                 } else {
                                     keepRunning = false;
-                                    Log.e(TAG, "Initialization failed.");
+                                    Log.e(TAG, "INIT - InitFeedback is null!");
                                 }
+                            } else {
+                                keepRunning = false;
+                                Log.e(TAG, "INIT - It is no AirPrima sensor station!");
                             }
+                        } else {
+                            keepRunning = false;
+                            Log.e(TAG, "INIT - InitStr is null!");
                         }
-                        while (keepRunning) {
-                            // Receive data
-                            txt = receive(is);
 
-                            if (txt != null) {
-                                Log.d(TAG, "Message: " + txt);
+                        // Main logic after initialization
+                        while (keepRunning && THREAD_RUN) {
 
-                                if (txt.equals("Deine Datenbank ist aktuell.")) {
-                                    sleep(10000);
-                                } else if (txt.matches(".*MEASUREMENT;.*")) {
-                                    String[] measurement = txt.split(";");
-                                    dbHandler.insertMeasurement(
-                                            Long.parseLong(measurement[1]),
-                                            unixTimestampToSQLiteTimestring(measurement[1]),
-                                            Float.parseFloat(measurement[2]),
-                                            Float.parseFloat(measurement[3]),
-                                            Float.parseFloat(measurement[4]),
-                                            Float.parseFloat(measurement[5]),
-                                            Long.parseLong(measurement[6])
-                                    );
+                            // Receive data in main loop
+                            String data = receive(inputStream, 1000);
+                            if (data != null) {
+
+                                if (data.equals("Deine Datenbank ist aktuell.")) {
+
+                                    try {
+                                        sleep(10000);
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "LOOP - Sleep interrupted!");
+                                    }
+
+                                    // Send latest/newest timestamp to sensor station, so that it can compare it with its latest timestamp
+                                    Log.d(TAG, "LOOP - Sending latest timestamp");
+                                    long timestamp = 1454000043;    // Some old timestamp ...
+                                    Cursor cursor = dbHandler.queryNewestTimestamp(locationID);
+                                    if (cursor != null) {
+                                        if(cursor.getCount() > 0) {
+                                            cursor.moveToFirst();
+                                            timestamp = cursor.getInt(cursor.getColumnIndex("measurement_timestamp"));
+                                            Log.d(TAG, "LOOP - Send latest timestamp " + timestamp);
+                                        } else {
+                                            Log.d(TAG, "LOOP - Send old timestamp " + timestamp);
+                                        }
+                                        send(outputStream, "TIMESTAMP;" + timestamp);
+                                        cursor.close();
+                                    }
+
+                                } else if (data.matches(".*MEASUREMENT;.*")) {
+                                    String[] measurements = data.split(";");
+                                    int counter = 1;
+                                    for(int i = 0; i < (measurements.length - 1) / 6; i++) {
+                                        dbHandler.insertMeasurement(
+                                                Long.parseLong(measurements[counter]),
+                                                unixTimestampToSQLiteTimestring(measurements[counter]),
+                                                Float.parseFloat(measurements[counter + 1]),
+                                                Float.parseFloat(measurements[counter + 2]),
+                                                Float.parseFloat(measurements[counter + 3]),
+                                                Float.parseFloat(measurements[counter + 4]),
+                                                Long.parseLong(measurements[counter + 5])
+                                        );
+                                        counter += 6;
+                                    }
+                                    Log.d(TAG, "LOOP - " + counter / 6 + " Measurements received!");
                                 }
+                            } else {
+                                Log.e(TAG, "LOOP - Data is null!");
                             }
-
-
-                            Cursor cursor = dbHandler.queryNewestTimestamp(ClientSocketThread.currentLocation);
-                            if (cursor != null) {
-                                // Get data from cursor
-                                cursor.moveToFirst();
-                                long timestamp = cursor.getInt(cursor.getColumnIndex("measurement_timestamp"));
-                                cursor.close();
-                                send(os, "TIMESTAMP;" + timestamp);
-                            }
-
-                            sleep(1000);
                         }
                     } else {
-                        Log.e(TAG, "Bluetooth socket is empty.");
-                        progressDialog.dismiss();
+                        Log.e(TAG, "INIT - BluetoothSocket is null!");
                     }
                 } catch (InterruptedException | IOException e) {
                     Log.e(TAG, null, e);
                     keepRunning = false;
                 } finally {
-                    Log.d(TAG, "Calling cancel() of " + t.getName());
+                    Log.d(TAG, "FINALLY - Calling cancel() of " + t.getName());
+                    if(dbHandler != null) {
+                        dbHandler.close();
+                    }
                     t.cancel();
+                    progressDialog.dismiss();
                 }
             }
         };
@@ -464,7 +514,7 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
      */
     private String unixTimestampToSQLiteTimestring(String timestamp) {
         long tmpTimestamp = Long.parseLong(timestamp);
-        Date date = new Date((long) tmpTimestamp * 1000); // Needs milliseconds and not seconds
+        Date date = new Date(tmpTimestamp * 1000); // Needs milliseconds and not seconds
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
@@ -477,28 +527,59 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
      */
     private void send(OutputStream os, String text) {
         try {
+            Log.d(TAG, "WRITE - >>" + text + "<<");
             os.write(text.getBytes());
         } catch (IOException e) {
-            Log.e(TAG, "Error while sending", e);
+            Log.e(TAG, "WRITE - Error while sending", e);
         }
     }
 
     /**
      * Receive string from AirPrima station
      */
-    private String receive(InputStream in) {
-        try {
-            int num = in.available();
-            if (num > 0) {
-                byte[] buffer = new byte[num];
-                int read = in.read(buffer);
-                if (read != -1) {
-                    return new String(buffer, 0, read);
+    private String receive(InputStream in, int maxLoopCount) {
+
+        final byte delimiter = 10;              // This is the ASCII code for a newline character
+        byte[] readBuffer = new byte[1024];
+        int readBufferPosition = 0;
+        int loopCounter = 0;
+        boolean stop = false;
+
+        while(!stop && loopCounter != maxLoopCount) {
+            try {
+                int bytesAvailable = in.available();
+                if(bytesAvailable > 0) {
+
+                    byte[] packetBytes = new byte[bytesAvailable];
+                    in.read(packetBytes);
+
+                    for(int i = 0; i < bytesAvailable; i++) {
+                        byte b = packetBytes[i];
+
+                        if(b == delimiter) {    // Is the byte a '\n'
+                            byte[] encodedBytes = new byte[readBufferPosition];
+                            System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                            final String data = new String(encodedBytes, StandardCharsets.US_ASCII);
+                            readBufferPosition = 0;
+
+                            Log.d(TAG, "RECEIVE - >>" + data + "<<");
+                            return data;
+
+                        } else {
+                            readBuffer[readBufferPosition++] = b;
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "RECEIVE - Available bytes < 0!");
                 }
+            } catch (IOException ex) {
+                stop = true;
             }
-        } catch (IOException e) {
-            Log.e(TAG, "Receive()", e);
+
+            loopCounter++;
+            Log.d(TAG, "RECEIVE - In progress (Counter: " + loopCounter + ")");
         }
+        Log.d(TAG, "RECEIVE - NULL!");
         return null;
     }
 

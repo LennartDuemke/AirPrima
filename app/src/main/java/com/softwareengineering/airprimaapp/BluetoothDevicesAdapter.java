@@ -29,6 +29,9 @@ public class BluetoothDevicesAdapter extends BaseAdapter {
     private Context mContext;
     private ConnectInterface connectInterface;
 
+    /**
+     * BroadcastReceiver that listens if pairing was successful
+     */
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -51,6 +54,9 @@ public class BluetoothDevicesAdapter extends BaseAdapter {
         }
     };
 
+    /**
+     * Constructor
+     */
     BluetoothDevicesAdapter(Context context, ConnectInterface connectInterface, ArrayList<BluetoothDevice> devices, boolean isPaired) {
         this.devices = devices;
         this.isPaired = isPaired;
@@ -62,24 +68,39 @@ public class BluetoothDevicesAdapter extends BaseAdapter {
         mContext.registerReceiver(receiver, filter);
     }
 
+    /**
+     * Updates the list
+     */
     void update(ArrayList<BluetoothDevice> list) {
         this.devices = list;
         //Triggers the list update
         notifyDataSetChanged();
     }
 
+    /**
+     * Returns the item count
+     */
     public int getCount() {
         return devices.size();
     }
 
+    /**
+     * Returns the current item
+     */
     public Object getItem(int position) {
         return devices.get(position);
     }
 
+    /**
+     * Returns the item id
+     */
     public long getItemId(int position) {
         return position;
     }
 
+    /**
+     * Returns the view of the list
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
@@ -114,7 +135,7 @@ public class BluetoothDevicesAdapter extends BaseAdapter {
                     public void onClick(final View v) {
                         connectInterface.stopDiscovery();
                         Log.d(TAG, "Start connecting to device " + tmpDevice.getAddress());
-                        connectInterface.startConnecting(tmpDevice);
+                        connectInterface.startConnecting(tmpDevice);    // Connecting the bluetooth devices
                     }
                 });
 
@@ -127,6 +148,8 @@ public class BluetoothDevicesAdapter extends BaseAdapter {
                 holder.buttonView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
+                        connectInterface.stopDiscovery();
+                        Log.d(TAG, "Start pairing with device " + tmpDevice.getAddress());
                         tmpDevice.createBond(); // Pairing the bluetooth devices
                     }
                 });
@@ -135,12 +158,18 @@ public class BluetoothDevicesAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /**
+     * Class that holds the views of a list item
+     */
     static class ViewHolder {
         TextView deviceNameView;
         TextView deviceAddressView;
         Button buttonView;
     }
 
+    /**
+     * Unregister the broadcast receiver when the adapter gets destroyed
+     */
     void onDestroy() {
         mContext.unregisterReceiver(receiver);
     }

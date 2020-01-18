@@ -29,15 +29,19 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout stationaryLayout = findViewById(R.id.main_stationary);
 
         // Register event listeners
+
+        // Mobile measurement
         mobileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent connectIntent = new Intent(v.getContext(), ConnectActivity.class);
-                connectIntent.putExtra("mode", "mobile");
-                startActivity(connectIntent);
+                Intent intentConnect = new Intent();
+                intentConnect.setClass(v.getContext(), ConnectActivity.class);
+                intentConnect.putExtra("id", ConnectActivity.MOBILE_MEASUREMENT_ID);
+                startActivity(intentConnect);
             }
         });
 
+        // Stationary measurement
         stationaryLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

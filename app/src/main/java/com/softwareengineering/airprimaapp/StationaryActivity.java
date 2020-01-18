@@ -29,19 +29,23 @@ public class StationaryActivity extends AppCompatActivity {
         LinearLayout oldDataLayout = findViewById(R.id.stationary_old_data);
 
         // Register event listeners
+
+        // Connect to sensor station
         connectLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent connectIntent = new Intent(v.getContext(), ConnectActivity.class);
-                connectIntent.putExtra("mode", "stationary");
-                startActivity(connectIntent);
+                Intent locationsIntent = new Intent(v.getContext(), LocationsActivity.class);
+                locationsIntent.putExtra("mode", "CONNECTED");
+                startActivity(locationsIntent);
             }
         });
 
+        // View old measurements (without connecting)
         oldDataLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent locationsIntent = new Intent(v.getContext(), LocationsActivity.class);
+                locationsIntent.putExtra("mode", "DISCONNECTED");
                 startActivity(locationsIntent);
             }
         });

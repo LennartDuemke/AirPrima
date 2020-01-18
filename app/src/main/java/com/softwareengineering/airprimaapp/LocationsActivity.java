@@ -10,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -54,20 +53,35 @@ public class LocationsActivity extends AppCompatActivity {
         listView.setAdapter(ca);
         updateList();
 
-        // Listener called when user clicks on item in ListView.
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Find out which measurement mode
+        Bundle bundle = getIntent().getExtras();
+            if(bundle != null) {
+                final String mode = bundle.getString("mode");
 
-                //Toast.makeText(view.getContext(), "Pressed item Id = " + id, Toast.LENGTH_SHORT).show();
+            // Listener called when user clicks on item in ListView.
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intentVisualize = new Intent();
-                intentVisualize.setClass(view.getContext(), VisualizationActivity.class);
-                intentVisualize.putExtra("id", id);
-                ClientSocketThread.currentLocation = id;
-                startActivity(intentVisualize);
-            }
-        });
+                    //Toast.makeText(view.getContext(), "Pressed item Id = " + id, Toast.LENGTH_SHORT).show();
+
+                    switch (mode) {
+                        case "CONNECTED":
+                            Intent intentConnect = new Intent();
+                            intentConnect.setClass(view.getContext(), ConnectActivity.class);
+                            intentConnect.putExtra("id", id);
+                            startActivity(intentConnect);
+                            break;
+                        case "DISCONNECTED":
+                            Intent intentVisualize = new Intent();
+                            intentVisualize.setClass(view.getContext(), VisualizationActivity.class);
+                            intentVisualize.putExtra("id", id);
+                            startActivity(intentVisualize);
+                            break;
+                    }
+                }
+            });
+        }
     }
 
     /**

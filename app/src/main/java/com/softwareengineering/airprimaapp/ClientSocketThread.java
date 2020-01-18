@@ -5,16 +5,16 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import java.io.IOException;
+import java.nio.channels.IllegalBlockingModeException;
 import java.util.UUID;
 
 /**
- * Get bluetooth socket instance for bluetooth client
+ * This class gets the bluetooth socket instance for the bluetooth client
  */
 class ClientSocketThread extends SocketThread {
 
     private static final String TAG = ClientSocketThread.class.getSimpleName();
     private BluetoothSocket socket;
-    static long currentLocation = -1;   // TODO Relocate
 
     /**
      * Constructor. Creates bluetooth socket
@@ -37,7 +37,15 @@ class ClientSocketThread extends SocketThread {
     public void run() {
         try {
             socket.connect();
-        } catch (IOException connectException) {
+
+        } catch (IOException e) {
+            Log.e(TAG, "Error occurred during the BT connection.", e);
+            cancel();
+        } catch (IllegalBlockingModeException e) {
+            Log.e(TAG, "Socket has an associated channel and the channel is in non-blocking mode.", e);
+            cancel();
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Endpoint is null or a SocketAddress subclass.", e);
             cancel();
         }
     }

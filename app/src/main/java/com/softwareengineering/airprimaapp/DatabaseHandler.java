@@ -66,7 +66,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Constructor
      */
-    DatabaseHandler(Context context) {
+    public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -121,7 +121,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserts a location into the table "location"
      */
-    void insertLocation(String locationName, int measuringFreq) {
+    public void insertLocation(String locationName, int measuringFreq) {
         long rowId = -1;
         try {
             SQLiteDatabase db = getWritableDatabase();
@@ -142,7 +142,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserts a measurement into the table "measurement"
      */
-    void insertMeasurement(long timestamp, String timestampFmt, float pm2_5, float pm10, float temp, float hum, long locationId) {
+    public void insertMeasurement(long timestamp, String timestampFmt, float pm2_5, float pm10, float temp, float hum, long locationId) {
         long rowId = -1;
         try {
             SQLiteDatabase db = getWritableDatabase();
@@ -168,7 +168,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Updates a location in the table "location"
      */
-    void updateLocation(long id, String locationName, int measuringFreq) {
+    public void updateLocation(long id, String locationName, int measuringFreq) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LOCATION_NAME, locationName);
@@ -180,7 +180,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Deletes a location in the table "location"
      */
-    void deleteLocation(long id) {
+    public void deleteLocation(long id) {
         SQLiteDatabase db = getWritableDatabase();
         int numDeleted = db.delete(TABLE_LOCATION, LOCATION_ID + " = ?", new String[]{Long.toString(id)});
         Log.d(TAG, "DB - deleteLocation(): id = " + id + " -> " + numDeleted);
@@ -189,7 +189,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Deletes all measurements that belong to a specific locationID
      */
-    void deleteLocationMeasurements(long locationID) {
+    public void deleteLocationMeasurements(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_LOCATION + " = ?",
                 new String[]{Long.toString(locationID)});
@@ -199,7 +199,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Deletes the mobile measurements that do not have to be saved
      */
-    void deleteAllMobileMeasurements() {
+    public void deleteAllMobileMeasurements() {
         SQLiteDatabase db = getWritableDatabase();
         int numDeleted = db.delete(TABLE_MEASUREMENT, MEASUREMENT_LOCATION + " = ?",
                 new String[]{String.valueOf(ConnectActivity.MOBILE_MEASUREMENT_ID)});
@@ -209,7 +209,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns a Cursor with all the locations (sorted)
      */
-    Cursor queryLocations() {
+    public Cursor queryLocations() {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_LOCATION, null, null, null,
                 null, null, LOCATION_NAME + " ASC");
@@ -218,7 +218,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the newest timestamp for one locationID
      */
-    Cursor queryNewestTimestamp(long locationID) {
+    public Cursor queryNewestTimestamp(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP},
@@ -230,7 +230,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns a Cursor with one specific location
      */
-    Cursor querySpecificLocation(long id) {
+    public Cursor querySpecificLocation(long id) {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_LOCATION, null, LOCATION_ID + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
@@ -239,7 +239,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the unique years that are in the database (for specific locationId)
      */
-    Cursor queryAllYears(long locationID) {
+    public Cursor queryAllYears(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%Y', measurement_timestamp_fmt)) AS year"},
                 MEASUREMENT_LOCATION + "=?", new String[]{String.valueOf(locationID)},
@@ -249,7 +249,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the unique calendar weeks that are in the database (for specific locationId)
      */
-    Cursor queryAllWeeks(long locationID, String year) {
+    public Cursor queryAllWeeks(long locationID, String year) {
         SQLiteDatabase db = getWritableDatabase();
         String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=?";
         return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%W', measurement_timestamp_fmt)) AS week"},
@@ -260,7 +260,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the unique months with measurements of a specific year and locationId
      */
-    Cursor queryAllMonths(long locationID, String year) {
+    public Cursor queryAllMonths(long locationID, String year) {
         SQLiteDatabase db = getWritableDatabase();
         String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=?";
         return db.query(TABLE_MEASUREMENT, new String[]{"DISTINCT (strftime('%m', measurement_timestamp_fmt)) AS month"},
@@ -271,7 +271,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the unique days with measurements of a specific year and month and locationId
      */
-    Cursor queryAllDays(long locationID, String year, String month) {
+    public Cursor queryAllDays(long locationID, String year, String month) {
         SQLiteDatabase db = getWritableDatabase();
         String whereString = MEASUREMENT_LOCATION + "=? AND strftime('%Y', measurement_timestamp_fmt)=? AND " +
                 "strftime('%m', measurement_timestamp_fmt)=?";
@@ -283,7 +283,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of one specific day for one locationID
      */
-    Cursor queryDay(long locationID, String year, String month, String day) {
+    public Cursor queryDay(long locationID, String year, String month, String day) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpDay = year + "-" + month + "-" + day + " 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -296,7 +296,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of one specific calendar week for one year and locationID
      */
-    Cursor queryWeek(long locationID, String year, String week) {
+    public Cursor queryWeek(long locationID, String year, String week) {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
                         MEASUREMENT_PM_10, MEASUREMENT_TEMP, MEASUREMENT_HUM},
@@ -309,7 +309,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of one specific month for one year and locationID
      */
-    Cursor queryMonth(long locationID, String year, String month) {
+    public Cursor queryMonth(long locationID, String year, String month) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpMonth = year + "-" + month + "-01 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -322,7 +322,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of one specific year for one locationID
      */
-    Cursor queryYear(long locationID, String year) {
+    public Cursor queryYear(long locationID, String year) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpYear = year + "-01-01 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -335,7 +335,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of one specific year for one locationID --> returns PM2.5
      */
-    Cursor queryYearPm2_5(long locationID, String year) {
+    public Cursor queryYearPm2_5(long locationID, String year) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpYear = year + "-01-01 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5},
@@ -347,7 +347,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of one specific year for one locationID --> returns PM10
      */
-    Cursor queryYearPm10(long locationID, String year) {
+    public Cursor queryYearPm10(long locationID, String year) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpYear = year + "-01-01 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_10},
@@ -359,7 +359,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of the newest day for one locationID
      */
-    Cursor queryNewestDay(long locationID) {
+    public Cursor queryNewestDay(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -373,7 +373,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of the newest calendar week for one locationID
      */
-    Cursor queryNewestWeek(long locationID) {
+    public Cursor queryNewestWeek(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -390,7 +390,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of the newest month for one locationID
      */
-    Cursor queryNewestMonth(long locationID) {
+    public Cursor queryNewestMonth(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -405,7 +405,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of the newest year for one locationID
      */
-    Cursor queryNewestYear(long locationID) {
+    public Cursor queryNewestYear(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5,
@@ -420,7 +420,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of the newest year for one locationID --> returns PM2.5
      */
-    Cursor queryNewestYearPm2_5(long locationID) {
+    public Cursor queryNewestYearPm2_5(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_2_5},
@@ -434,7 +434,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns all the measurements of the newest year for one locationID --> returns PM10
      */
-    Cursor queryNewestYearPm10(long locationID) {
+    public Cursor queryNewestYearPm10(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_TIMESTAMP_FMT, MEASUREMENT_PM_10},
@@ -448,7 +448,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the newest measurement for one locationID
      */
-    Cursor queryNewestMeasurement(long locationID) {
+    public Cursor queryNewestMeasurement(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{MEASUREMENT_PM_2_5, MEASUREMENT_PM_10, MEASUREMENT_TEMP,
@@ -464,7 +464,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the min and max values for one specific day for one locationID
      */
-    Cursor queryMinMaxDay(long locationID, String year, String month, String day) {
+    public Cursor queryMinMaxDay(long locationID, String year, String month, String day) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpDay = year + "-" + month + "-" + day + " 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
@@ -479,7 +479,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the min and max values for one specific calendar week of one year and locationID
      */
-    Cursor queryMinMaxWeek(long locationID, String year, String week) {
+    public Cursor queryMinMaxWeek(long locationID, String year, String week) {
         SQLiteDatabase db = getWritableDatabase();
         return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
                         "min(measurement_pm_2_5) AS 'min2_5'", "max(measurement_pm_10) AS 'max10'",
@@ -494,7 +494,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the min and max values for one specific month for one year and locationID
      */
-    Cursor queryMinMaxMonth(long locationID, String year, String month) {
+    public Cursor queryMinMaxMonth(long locationID, String year, String month) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpMonth = year + "-" + month + "-01 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
@@ -509,7 +509,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the min and max values for one specific year for one locationID
      */
-    Cursor queryMinMaxYear(long locationID, String year) {
+    public Cursor queryMinMaxYear(long locationID, String year) {
         SQLiteDatabase db = getWritableDatabase();
         String tmpYear = year + "-01-01 01:01:01";
         return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
@@ -524,7 +524,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * SQL query that returns the min and max values of the newest day for one locationID
      */
-    Cursor queryNewestDayMinMax(long locationID) {
+    public Cursor queryNewestDayMinMax(long locationID) {
         SQLiteDatabase db = getWritableDatabase();
         String strLocationID = String.valueOf(locationID);
         return db.query(TABLE_MEASUREMENT, new String[]{"max(measurement_pm_2_5) AS 'max2_5'",
