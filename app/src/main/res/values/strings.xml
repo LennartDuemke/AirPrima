@@ -122,6 +122,8 @@
     <string name="bt_connect_no_geolocation">Standortzugriff ist notwendig!</string>
     <string name="bt_connect_pairing_success">Koppelung erfolgreich!</string>
     <string name="bt_connect_pairing_cancel">Koppelung fehlgeschlagen!</string>
+    <string name="bt_connect_connection_failed">Verbindung fehlgeschlagen!</string>
+    <string name="bt_connect_thread_dead">Sie können sich nun erneut verbinden!</string>
 
     <string name="pie_chart_title">%1$s - Einordnung der Tage im Jahr\n[European Air Quality Index]</string>
     <string name="pie_chart_legend_name">EAQI Level</string>

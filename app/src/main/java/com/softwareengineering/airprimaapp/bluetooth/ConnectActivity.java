@@ -459,6 +459,16 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                             Log.e(TAG, "INIT - InitStr is null!");
                         }
 
+                        // Toast for user if no connection could be made
+                        if(!keepRunning) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, R.string.bt_connect_connection_failed, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+
                         // Main logic after initialization
                         while (keepRunning && THREAD_RUN) {
 
@@ -533,6 +543,12 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                         }
                     } else {
                         Log.e(TAG, "INIT - BluetoothSocket is null!");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, R.string.bt_connect_connection_failed, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 } catch (InterruptedException | IOException e) {
                     Log.e(TAG, null, e);
@@ -544,6 +560,13 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
                     }
                     t.cancel();
                     progressDialog.dismiss();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), R.string.bt_connect_thread_dead, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         };
