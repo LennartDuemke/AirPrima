@@ -583,7 +583,7 @@ public class ConnectActivity extends AppCompatActivity implements ConnectInterfa
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         return sdf.format(date);
     }
 
